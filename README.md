@@ -12,6 +12,10 @@ Add and remove players on the Players page with a SteamID64, a Steam profile lin
 
 All players share one Cybershoke client that spaces requests 1.5 seconds apart and reuses a server's scoreboard for players on the same server, so a handful of players stays well below Cybershoke's rate limit.
 
+### Demo player
+
+"Add demo player" on the Players page creates a simulated player with 60 days of history who starts playing right away (DM, HS DM, Pistol DM and Retake in rotation, a few minutes offline in between). That fills every page, including the live view and the compare page, without anyone being on Cybershoke. It never talks to Cybershoke, runs even with `TRACKER_ENABLED=false`, and is regenerated on every restart. Stop tracking it to delete its data.
+
 ## Compare
 
 Pick players, a mode and a time range. The table shows the tracked sessions in that range (K/D, kills per minute, headshots, accuracy, damage, time to kill, rank points) next to the all-time numbers from each profile, with the best value per row in bold. The chart below draws each player's 10-session average for the stat you choose.
