@@ -14,14 +14,18 @@
 	let { data, children }: LayoutProps = $props();
 
 	const anyLive = $derived(data.players.some((p) => p.status?.state === 'in_game'));
+	const anyStarting = $derived(
+		data.players.some((p) => !p.status || p.status.state === 'starting')
+	);
 	const path = $derived(page.url.pathname);
+	const compact = $derived(data.players.length > 4);
 
 	$effect(() => {
 		const interval = setInterval(
 			() => {
 				if (document.visibilityState === 'visible') refreshAll();
 			},
-			anyLive ? 15_000 : 60_000
+			anyStarting ? 3_000 : anyLive ? 15_000 : 60_000
 		);
 		return () => clearInterval(interval);
 	});
@@ -34,25 +38,35 @@
 
 <header>
 	<span class="brand">cyber-tracker</span>
-	<nav aria-label="Players">
+	<nav class="players" aria-label="Players">
 		<ul>
 			{#each data.players as player (player.steamid64)}
 				{@const href = resolve('/p/[steamid]', { steamid: player.steamid64 })}
+				{@const current = path.startsWith(`/p/${player.steamid64}`)}
+				{@const name = player.info?.name ?? player.steamid64}
+				{@const live = player.status?.state === 'in_game'}
 				<li>
-					<a {href} aria-current={path.startsWith(`/p/${player.steamid64}`) ? 'page' : undefined}>
+					<a
+						{href}
+						class:icon={compact && !current && player.info}
+						aria-current={current ? 'page' : undefined}
+						title={live ? `${name}, in game now` : name}
+					>
 						{#if player.info}
-							<img src={player.info.avatar} alt="" width="22" height="22" />
+							<span class="avatar">
+								<img src={player.info.avatar} alt="" width="24" height="24" />
+								{#if live}<span class="live"></span>{/if}
+							</span>
 						{/if}
-						<span>{player.info?.name ?? player.steamid64}</span>
-						{#if player.status?.state === 'in_game'}
-							<span class="live" title="In game now"><span class="visually-hidden">live</span></span
-							>
-						{/if}
+						<span class="name">{name}</span>
+						{#if live}<span class="visually-hidden">, in game</span>{/if}
 					</a>
 				</li>
 			{/each}
 		</ul>
-		<ul class="tools">
+	</nav>
+	<nav class="tools" aria-label="Pages">
+		<ul>
 			{#if data.players.length > 1}
 				<li>
 					<a
@@ -86,10 +100,9 @@
 	header {
 		display: flex;
 		align-items: center;
-		gap: 12px 24px;
-		flex-wrap: wrap;
-		padding-top: 14px;
-		padding-bottom: 14px;
+		gap: 12px 20px;
+		padding-top: 12px;
+		padding-bottom: 12px;
 		border-bottom: 1px solid var(--rule);
 		margin-bottom: 20px;
 	}
@@ -99,28 +112,23 @@
 		font-weight: 600;
 		font-size: 1.25rem;
 		color: var(--ink-2);
+		white-space: nowrap;
 	}
 
-	nav {
-		display: flex;
-		flex: 1 1 340px;
-		gap: 8px 16px;
-		flex-wrap: wrap;
-		align-items: center;
+	.players {
+		flex: 1;
 		min-width: 0;
+		overflow-x: auto;
+		scrollbar-width: none;
+		mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
 	}
 
 	ul {
 		display: flex;
-		flex-wrap: wrap;
 		gap: 2px;
 		list-style: none;
 		margin: 0;
-		padding: 0;
-	}
-
-	.tools {
-		margin-left: auto;
+		padding: 2px;
 	}
 
 	a {
@@ -132,6 +140,18 @@
 		color: var(--ink-2);
 		text-decoration: none;
 		white-space: nowrap;
+	}
+
+	a.icon {
+		padding-right: 4px;
+	}
+
+	a.icon .name {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip: rect(0 0 0 0);
 	}
 
 	.tools a {
@@ -150,15 +170,25 @@
 		font-weight: 500;
 	}
 
+	.avatar {
+		position: relative;
+		display: flex;
+		flex: none;
+	}
+
 	img {
 		border-radius: 50%;
 	}
 
 	.live {
-		width: 7px;
-		height: 7px;
+		position: absolute;
+		right: -2px;
+		bottom: -2px;
+		width: 10px;
+		height: 10px;
 		border-radius: 50%;
 		background: var(--kill);
+		box-shadow: 0 0 0 2px var(--page);
 	}
 
 	main {
@@ -170,8 +200,8 @@
 			--gutter: 16px;
 		}
 
-		.tools {
-			margin-left: 0;
+		.brand {
+			display: none;
 		}
 	}
 </style>
