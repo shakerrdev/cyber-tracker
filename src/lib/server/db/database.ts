@@ -45,6 +45,13 @@ const MIGRATIONS = [
 		ttk_ms integer
 	);
 	create index live_sample_player_time on live_sample (steamid64, taken_at);
+	`,
+	`
+	create table tracked (
+		steamid64 text primary key,
+		added_at integer not null
+	);
+	insert into tracked (steamid64, added_at) select steamid64, updated_at from player;
 	`
 ];
 

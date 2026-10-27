@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 export interface Config {
-	steamid64: string;
+	initialPlayers: string[];
 	dataDir: string;
 	baseUrl: string;
 	trackerEnabled: boolean;
@@ -39,12 +39,14 @@ function bool(name: string, fallback: boolean): boolean {
 
 export function readConfig(): Config {
 	loadEnvFile();
-	const steamid64 = process.env.STEAMID64 ?? '';
-	if (!/^7656\d{13}$/.test(steamid64)) {
-		throw new Error(`STEAMID64 must be a SteamID64 like 76561198056395137, got "${steamid64}"`);
+	const initialPlayers = (process.env.STEAMID64 ?? '').split(/[\s,]+/).filter(Boolean);
+	for (const id of initialPlayers) {
+		if (!/^7656\d{13}$/.test(id)) {
+			throw new Error(`STEAMID64 must list SteamID64s like 76561198056395137, got "${id}"`);
+		}
 	}
 	return {
-		steamid64,
+		initialPlayers,
 		dataDir: resolve(process.env.DATA_DIR || 'data'),
 		baseUrl: process.env.CYBERSHOKE_BASE_URL || 'https://cybershoke.net',
 		trackerEnabled: bool('TRACKER_ENABLED', true),

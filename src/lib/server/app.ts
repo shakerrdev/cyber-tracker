@@ -1,16 +1,16 @@
 import { join } from 'node:path';
 import { config, type Config } from './config.ts';
 import { createClient } from './cybershoke/client.ts';
+import { createSharedClient } from './cybershoke/shared.ts';
 import { openDatabase } from './db/database.ts';
 import { Store } from './db/store.ts';
+import { PlayerManager } from './players/manager.ts';
 import { StatsService } from './stats/service.ts';
-import { Ingestor } from './tracker/ingest.ts';
-import { Tracker } from './tracker/tracker.ts';
 
 export interface App {
 	config: Config;
 	store: Store;
-	tracker: Tracker;
+	players: PlayerManager;
 	stats: StatsService;
 }
 
@@ -23,22 +23,21 @@ export function app(): App {
 
 	const cfg = config();
 	const store = new Store(openDatabase(join(cfg.dataDir, 'cyber-tracker.db')));
-	const tracker = new Tracker({
-		client: createClient({ baseUrl: cfg.baseUrl }),
-		ingestor: new Ingestor(store, cfg.steamid64),
-		steamid64: cfg.steamid64,
+	const players = new PlayerManager({
+		store,
+		client: createSharedClient(createClient({ baseUrl: cfg.baseUrl })),
+		enabled: cfg.trackerEnabled,
 		profileIntervalSec: cfg.profileIntervalSec,
 		idleProfileIntervalSec: cfg.idleProfileIntervalSec,
 		liveIntervalSec: cfg.liveIntervalSec
 	});
-
-	const stats = new StatsService(store, cfg.steamid64, cfg.sessionGapMin * 60);
-	const instance: App = { config: cfg, store, tracker, stats };
+	const stats = new StatsService(store, cfg.sessionGapMin * 60);
+	const instance: App = { config: cfg, store, players, stats };
 	holder[key] = instance;
 
-	if (cfg.trackerEnabled) tracker.start();
+	players.start(cfg.initialPlayers);
 	process.once('sveltekit:shutdown', () => {
-		tracker.stop();
+		players.stop();
 		store.db.close();
 	});
 

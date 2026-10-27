@@ -148,6 +148,19 @@ describe('extractLiveSample', () => {
 		expect(sample?.ttkMs).toBeNull();
 	});
 
+	it('uses the name to pick between players with the same avatar', () => {
+		const twins = {
+			...server,
+			playersv2: [
+				{ ...server.playersv2![1], name: 'friend', kills: 1 },
+				{ ...server.playersv2![1], name: 'me', kills: 2 }
+			]
+		};
+		const target = { avatarHash: 'b284d5767324e835e8f40737143441acdabb0cbe', name: 'me' };
+		expect(extractLiveSample(twins, target, fallback, 1)?.kills).toBe(2);
+		expect(extractLiveSample(twins, { ...target, name: 'renamed' }, fallback, 1)).toBeNull();
+	});
+
 	it('returns null when the player is not on the server', () => {
 		expect(
 			extractLiveSample(server, { avatarHash: 'f'.repeat(40), name: 'nobody' }, fallback, 1)

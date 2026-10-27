@@ -90,6 +90,39 @@ export class Store {
 		};
 	}
 
+	tracked(): string[] {
+		const rows = this.db
+			.prepare('select steamid64 from tracked order by added_at, steamid64')
+			.all() as unknown as { steamid64: string }[];
+		return rows.map((r) => r.steamid64);
+	}
+
+	track(steamid64: string, at: number): boolean {
+		const result = this.db
+			.prepare('insert into tracked (steamid64, added_at) values (?, ?) on conflict do nothing')
+			.run(steamid64, at);
+		return Number(result.changes) > 0;
+	}
+
+	untrack(steamid64: string): boolean {
+		const result = this.db.prepare('delete from tracked where steamid64 = ?').run(steamid64);
+		return Number(result.changes) > 0;
+	}
+
+	latestSnapshot(steamid64: string): Snapshot | null {
+		const row = this.db
+			.prepare(
+				'select id, taken_at, stats from snapshot where steamid64 = ? order by taken_at desc, id desc limit 1'
+			)
+			.get(steamid64) as SnapshotRow | undefined;
+		if (!row) return null;
+		return {
+			id: row.id,
+			takenAt: row.taken_at,
+			stats: JSON.parse(gunzipSync(row.stats).toString('utf8')) as StatsSnapshot
+		};
+	}
+
 	latestSnapshotHash(steamid64: string): string | null {
 		const row = this.db
 			.prepare(

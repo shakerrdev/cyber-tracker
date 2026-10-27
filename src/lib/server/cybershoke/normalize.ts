@@ -195,8 +195,12 @@ export function extractLiveSample(
 ): LiveSample | null {
 	const info = data.serversv2?.['0'] ?? Object.values(data.serversv2 ?? {})[0];
 	const players = data.playersv2 ?? [];
+	const sameAvatar = target.avatarHash
+		? players.filter((p) => avatarHash(p.avatar) === target.avatarHash)
+		: [];
 	const line =
-		(target.avatarHash && players.find((p) => avatarHash(p.avatar) === target.avatarHash)) ||
+		sameAvatar.find((p) => p.name === target.name) ??
+		(sameAvatar.length === 1 ? sameAvatar[0] : undefined) ??
 		players.find((p) => p.name === target.name);
 	if (!info || !line || info.id_mode === undefined) return null;
 	return {
