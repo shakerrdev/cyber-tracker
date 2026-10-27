@@ -6,8 +6,8 @@ import { curveFor, mapRows, sessionRow, weaponRows } from '#lib/server/stats/vie
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = ({ params, url }) => {
-	const { stats, tracker } = app();
-	const sessions = stats.sessions(tracker.status.state === 'in_game');
+	const { stats, players } = app();
+	const sessions = stats.sessions(params.steamid, players.isLive(params.steamid));
 	const index = sessions.findIndex((s) => s.id === params.id);
 	if (index < 0)
 		error(404, 'This session no longer exists. Sessions are regrouped as new data arrives.');

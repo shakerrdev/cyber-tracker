@@ -1,21 +1,27 @@
 import { app } from '#lib/server/app.ts';
+import type { PlayerView } from '#lib/views.ts';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = () => {
-	const { config, store, tracker } = app();
-	const { state, presence, live, lastProfileAt, lastError } = tracker.status;
+	const { config, store, players } = app();
+	const list: PlayerView[] = players.ids().map((steamid64) => {
+		const status = players.status(steamid64);
+		return {
+			steamid64,
+			info: store.player(steamid64),
+			status: status && {
+				state: status.state,
+				presence: status.presence,
+				live: status.live,
+				lastProfileAt: status.lastProfileAt,
+				lastError: status.lastError
+			}
+		};
+	});
 	return {
 		timeZone: config.timeZone,
 		now: Math.floor(Date.now() / 1000),
-		player: store.player(config.steamid64),
-		steamid64: config.steamid64,
-		tracker: {
-			enabled: config.trackerEnabled,
-			state,
-			presence,
-			live,
-			lastProfileAt,
-			lastError
-		}
+		trackerEnabled: config.trackerEnabled,
+		players: list
 	};
 };

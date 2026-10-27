@@ -1,16 +1,17 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
 	import { FILTER_OPTIONS } from '#lib/modes.ts';
 	import { RANGES, type Range } from '#lib/views.ts';
 
 	interface Props {
 		mode: string;
 		range: Range;
+		base: string;
+		extra?: string;
 	}
 
-	let { mode, range }: Props = $props();
+	let { mode, range, base, extra = '' }: Props = $props();
 
-	const href = (m: string, r: Range) => `${resolve('/')}?mode=${m}&range=${r}`;
+	const href = (m: string, r: Range) => `${base}?mode=${m}&range=${r}${extra}`;
 	const groups = [
 		{ label: 'Deathmatch', options: FILTER_OPTIONS.filter((o) => o.group === 'dm') },
 		{ label: 'Retake and Execute', options: FILTER_OPTIONS.filter((o) => o.group !== 'dm') }

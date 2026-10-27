@@ -1,4 +1,5 @@
 import type { Metrics } from './metrics.ts';
+import type { LiveSample, PlayerInfo, Presence } from './types.ts';
 
 export type Range = '30d' | '90d' | 'all';
 
@@ -60,4 +61,36 @@ export interface MapRow {
 	kills: number;
 	playtime: number;
 	kpm: number | null;
+}
+
+export interface PlayerView {
+	steamid64: string;
+	info: PlayerInfo | null;
+	status: {
+		state: string;
+		presence: Presence | null;
+		live: LiveSample | null;
+		lastProfileAt: number | null;
+		lastError: { at: number; message: string } | null;
+	} | null;
+}
+
+export interface AllTimeStats {
+	asOf: number;
+	kills: number;
+	playtime: number;
+	kpm: number | null;
+	hsPct: number | null;
+	accuracy: number | null;
+	headHitPct: number | null;
+	dpm: number | null;
+	kdAllModes: number | null;
+}
+
+export interface CompareStats {
+	sessions: number;
+	tracked: Metrics;
+	allTime: AllTimeStats | null;
+	points: number | null;
+	trend: { id: string; t: number; average: Metrics }[];
 }

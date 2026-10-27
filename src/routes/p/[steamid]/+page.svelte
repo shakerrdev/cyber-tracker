@@ -16,6 +16,7 @@
 
 	const tz = $derived(data.timeZone);
 	const modeQuery = $derived(`?mode=${data.filter.slug}`);
+	const steamid = $derived(data.player.steamid64);
 	const hero = $derived(data.hero);
 
 	let trendKey = $state<MetricKey | 'points'>('kpm');
@@ -38,14 +39,14 @@
 	);
 </script>
 
-<FilterBar mode={data.filter.slug} range={data.range} />
+<FilterBar mode={data.filter.slug} range={data.range} base={resolve('/p/[steamid]', { steamid })} />
 
 {#if !hero}
 	<section class="panel empty">
 		<h2>No {data.filter.label} sessions yet</h2>
 		<p class="secondary">
-			The tracker checks your Cybershoke profile every minute. Play a round of {data.filter.label} and
-			it shows up here once you leave the server; while you're on a server you'll see it live.
+			The tracker checks this Cybershoke profile every minute. A round of {data.filter.label} shows up
+			here once the player leaves the server, and live while they're still on it.
 		</p>
 	</section>
 {:else}
@@ -60,7 +61,9 @@
 					)}, {formatDuration(hero.row.playtime)} on {hero.row.modeIds.map(modeLabel).join(', ')}
 				</p>
 			</div>
-			<a class="more" href="{resolve('/sessions/[id]', { id: hero.row.id })}{modeQuery}"
+			<a
+				class="more"
+				href="{resolve('/p/[steamid]/sessions/[id]', { steamid, id: hero.row.id })}{modeQuery}"
 				>Session details</a
 			>
 		</div>
@@ -70,12 +73,12 @@
 		{#if hero.curve.length > 0}
 			<KillCurve segments={hero.curve} timeZone={tz} />
 			<p class="curve-note muted">
-				Running totals from the live scoreboard. The shaded band shows how far your kills were ahead
-				of your deaths, or behind them.
+				Running totals from the live scoreboard. The shaded band shows how far kills were ahead of
+				deaths, or behind them.
 			</p>
 		{:else}
 			<p class="no-curve muted">
-				No live samples for this session, so there's no kill curve. The totals come from your
+				No live samples for this session, so there's no kill curve. The totals come from the
 				profile.
 			</p>
 		{/if}
@@ -88,7 +91,7 @@
 				<p class="muted">
 					Each dot is a session of {data.filter.label}{trendKey === 'points'
 						? ''
-						: ', the line your 10-session average'}.
+						: ', the line the 10-session average'}.
 				</p>
 			</div>
 			<div class="switch" role="tablist" aria-label="Stat">
@@ -101,7 +104,7 @@
 				{/each}
 			</div>
 		</div>
-		<TrendChart points={data.trend} metric={trendMetric} timeZone={tz} {modeQuery} />
+		<TrendChart points={data.trend} metric={trendMetric} timeZone={tz} {modeQuery} {steamid} />
 	</section>
 
 	<p class="summary secondary">
@@ -120,6 +123,7 @@
 					rows={visibleSessions}
 					timeZone={tz}
 					{modeQuery}
+					{steamid}
 					showModes={!data.filter.single}
 				/>
 				{#if data.sessions.length > SESSION_PREVIEW}
@@ -136,7 +140,7 @@
 			{#if data.weapons.length}
 				<WeaponsTable rows={data.weapons} />
 			{:else}
-				<p class="muted">Weapon stats arrive with your first finished session.</p>
+				<p class="muted">Weapon stats arrive with the first finished session.</p>
 			{/if}
 		</section>
 	</div>

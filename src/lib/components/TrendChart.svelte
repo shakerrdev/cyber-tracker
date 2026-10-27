@@ -12,10 +12,11 @@
 		metric: MetricDef | 'points';
 		timeZone: string;
 		modeQuery: string;
+		steamid: string;
 		height?: number;
 	}
 
-	let { points, metric, timeZone, modeQuery, height = 280 }: Props = $props();
+	let { points, metric, timeZone, modeQuery, steamid, height = 280 }: Props = $props();
 
 	let width = $state(0);
 	let hover = $state<number | null>(null);
@@ -87,7 +88,8 @@
 		);
 	}
 
-	const sessionHref = (id: string) => `${resolve('/sessions/[id]', { id })}${modeQuery}`;
+	const sessionHref = (id: string) =>
+		`${resolve('/p/[steamid]/sessions/[id]', { steamid, id })}${modeQuery}`;
 </script>
 
 <figure class="trend" bind:clientWidth={width} style:height="{height}px">

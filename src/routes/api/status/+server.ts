@@ -2,10 +2,13 @@ import { app } from '#lib/server/app.ts';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = () => {
-	const { config, tracker } = app();
+	const { config, players, store } = app();
 	return Response.json({
-		steamid64: config.steamid64,
 		trackerEnabled: config.trackerEnabled,
-		...tracker.status
+		players: players.ids().map((steamid64) => ({
+			steamid64,
+			name: store.player(steamid64)?.name ?? null,
+			...players.status(steamid64)
+		}))
 	});
 };

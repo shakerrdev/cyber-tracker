@@ -8,19 +8,20 @@
 	import favicon from '#lib/assets/favicon.svg';
 	import { refreshAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import TrackerStatus from '#lib/components/TrackerStatus.svelte';
+	import { page } from '$app/state';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
 
-	const inGame = $derived(data.tracker.state === 'in_game');
+	const anyLive = $derived(data.players.some((p) => p.status?.state === 'in_game'));
+	const path = $derived(page.url.pathname);
 
 	$effect(() => {
 		const interval = setInterval(
 			() => {
 				if (document.visibilityState === 'visible') refreshAll();
 			},
-			inGame ? 15_000 : 60_000
+			anyLive ? 15_000 : 60_000
 		);
 		return () => clearInterval(interval);
 	});
@@ -32,26 +33,42 @@
 </svelte:head>
 
 <header>
-	<a class="who" href={resolve('/')}>
-		{#if data.player}
-			<img src={data.player.avatar} alt="" width="40" height="40" />
-			<span class="name">{data.player.name}</span>
-			{#if data.player.faceitLevel}
-				<span class="faceit">FACEIT {data.player.faceitLevel}, {data.player.faceitElo} Elo</span>
+	<span class="brand">cyber-tracker</span>
+	<nav aria-label="Players">
+		<ul>
+			{#each data.players as player (player.steamid64)}
+				{@const href = resolve('/p/[steamid]', { steamid: player.steamid64 })}
+				<li>
+					<a {href} aria-current={path.startsWith(`/p/${player.steamid64}`) ? 'page' : undefined}>
+						{#if player.info}
+							<img src={player.info.avatar} alt="" width="22" height="22" />
+						{/if}
+						<span>{player.info?.name ?? player.steamid64}</span>
+						{#if player.status?.state === 'in_game'}
+							<span class="live" title="In game now"><span class="visually-hidden">live</span></span
+							>
+						{/if}
+					</a>
+				</li>
+			{/each}
+		</ul>
+		<ul class="tools">
+			{#if data.players.length > 1}
+				<li>
+					<a
+						href={resolve('/compare')}
+						aria-current={path.startsWith('/compare') ? 'page' : undefined}>Compare</a
+					>
+				</li>
 			{/if}
-		{:else}
-			<span class="name">cyber-tracker</span>
-		{/if}
-	</a>
-	<TrackerStatus
-		enabled={data.tracker.enabled}
-		state={data.tracker.state}
-		presence={data.tracker.presence}
-		live={data.tracker.live}
-		lastSeen={data.player?.lastSeen ?? null}
-		lastError={data.tracker.lastError}
-		now={data.now}
-	/>
+			<li>
+				<a
+					href={resolve('/players')}
+					aria-current={path.startsWith('/players') ? 'page' : undefined}>Players</a
+				>
+			</li>
+		</ul>
+	</nav>
 </header>
 
 <main>
@@ -69,36 +86,79 @@
 	header {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		gap: 16px;
+		gap: 12px 24px;
 		flex-wrap: wrap;
-		padding-top: 20px;
-		padding-bottom: 20px;
+		padding-top: 14px;
+		padding-bottom: 14px;
+		border-bottom: 1px solid var(--rule);
+		margin-bottom: 20px;
 	}
 
-	.who {
+	.brand {
+		font-family: var(--font-condensed);
+		font-weight: 600;
+		font-size: 1.25rem;
+		color: var(--ink-2);
+	}
+
+	nav {
 		display: flex;
+		flex: 1 1 340px;
+		gap: 8px 16px;
+		flex-wrap: wrap;
 		align-items: center;
-		gap: 12px;
-		text-decoration: none;
 		min-width: 0;
 	}
 
+	ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 2px;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.tools {
+		margin-left: auto;
+	}
+
+	a {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 4px 12px 4px 4px;
+		border-radius: 999px;
+		color: var(--ink-2);
+		text-decoration: none;
+		white-space: nowrap;
+	}
+
+	.tools a {
+		padding-left: 12px;
+	}
+
+	a:hover {
+		color: var(--ink);
+		background: var(--panel);
+	}
+
+	a[aria-current='page'] {
+		color: var(--ink);
+		background: var(--panel-raised);
+		box-shadow: inset 0 0 0 1px var(--rule);
+		font-weight: 500;
+	}
+
 	img {
-		border-radius: 4px;
-		flex: none;
+		border-radius: 50%;
 	}
 
-	.name {
-		font-family: var(--font-condensed);
-		font-weight: 600;
-		font-size: 1.5rem;
-		line-height: 1;
-	}
-
-	.faceit {
-		color: var(--ink-3);
-		font-size: 0.9375rem;
+	.live {
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		background: var(--kill);
 	}
 
 	main {
@@ -110,8 +170,8 @@
 			--gutter: 16px;
 		}
 
-		.faceit {
-			display: none;
+		.tools {
+			margin-left: 0;
 		}
 	}
 </style>

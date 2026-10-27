@@ -47,15 +47,15 @@
 		<p class="note muted">
 			{#if compare}
 				{#if baseline}
-					Compared with your previous {baseline.count === 1
+					Compared with the previous {baseline.count === 1
 						? 'session'
 						: `${baseline.count} sessions`}.
 				{:else}
-					Your first tracked session. Comparisons start with the next one.
+					The first tracked session. Comparisons start with the next one.
 				{/if}
 			{/if}
 			{#if row.provisional}
-				Live numbers for now; the full stats arrive when you leave the server.
+				Live numbers for now; the full stats arrive after leaving the server.
 			{/if}
 		</p>
 	{/if}

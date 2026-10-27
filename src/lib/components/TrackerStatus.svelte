@@ -37,7 +37,7 @@
 			</span>
 		{/if}
 	{:else if state === 'hidden'}
-		<span>In a game, but the server is hidden in your Cybershoke settings</span>
+		<span>In a game, but the server is hidden in their Cybershoke settings</span>
 	{:else if state === 'other_mode' && presence?.kind === 'server'}
 		<span>Playing {presence.modeKey}, which isn't tracked</span>
 	{:else if state === 'error' && lastError}

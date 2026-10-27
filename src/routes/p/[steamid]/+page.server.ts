@@ -12,17 +12,20 @@ import {
 import { parseRange, RANGES } from '#lib/views.ts';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = ({ url }) => {
+export const load: PageServerLoad = ({ params, url }) => {
 	const filter = parseModeFilter(url.searchParams.get('mode'));
 	const range = parseRange(url.searchParams.get('range'));
 	const modeIds = filterModeIds(filter);
-	const { stats, tracker } = app();
+	const { stats, players } = app();
 
 	const now = Math.floor(Date.now() / 1000);
 	const days = RANGES.find((r) => r.value === range)?.days ?? null;
 	const since = days === null ? 0 : now - days * 86_400;
 
-	const sessions = relevantSessions(stats.sessions(tracker.status.state === 'in_game'), modeIds);
+	const sessions = relevantSessions(
+		stats.sessions(params.steamid, players.isLive(params.steamid)),
+		modeIds
+	);
 	const inRange = sessions.filter((s) => s.endedAt >= since);
 	const latest = sessions.at(-1) ?? null;
 	const rangeTotals = combine(

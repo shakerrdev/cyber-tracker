@@ -19,6 +19,7 @@
 	let { data }: PageProps = $props();
 
 	const query = $derived(`?mode=${data.back}`);
+	const steamid = $derived(data.player.steamid64);
 	const row = $derived(data.row);
 </script>
 
@@ -27,7 +28,7 @@
 </svelte:head>
 
 <nav class="crumbs">
-	<a href="{resolve('/')}{query}">All sessions</a>
+	<a href="{resolve('/p/[steamid]', { steamid })}{query}">All sessions</a>
 </nav>
 
 <section class="panel">
@@ -142,7 +143,7 @@
 		{#if data.weapons.length}
 			<WeaponsTable rows={data.weapons} />
 		{:else}
-			<p class="muted">Weapon stats arrive once you leave the server.</p>
+			<p class="muted">Weapon stats arrive once the player leaves the server.</p>
 		{/if}
 	</section>
 	<section class="block" aria-labelledby="streaks-title">
@@ -181,10 +182,16 @@
 
 <nav class="pager" aria-label="Other sessions">
 	{#if data.earlier}
-		<a href="{resolve('/sessions/[id]', { id: data.earlier })}{query}">Earlier session</a>
+		<a href="{resolve('/p/[steamid]/sessions/[id]', { steamid, id: data.earlier })}{query}"
+			>Earlier session</a
+		>
 	{/if}
 	{#if data.later}
-		<a class="later" href="{resolve('/sessions/[id]', { id: data.later })}{query}">Later session</a>
+		<a
+			class="later"
+			href="{resolve('/p/[steamid]/sessions/[id]', { steamid, id: data.later })}{query}"
+			>Later session</a
+		>
 	{/if}
 </nav>
 

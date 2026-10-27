@@ -8,10 +8,11 @@
 		rows: SessionRow[];
 		timeZone: string;
 		modeQuery: string;
+		steamid: string;
 		showModes: boolean;
 	}
 
-	let { rows, timeZone, modeQuery, showModes }: Props = $props();
+	let { rows, timeZone, modeQuery, showModes, steamid }: Props = $props();
 </script>
 
 <div class="scroll">
@@ -34,7 +35,7 @@
 			{#each rows as row (row.id)}
 				<tr>
 					<td>
-						<a href="{resolve('/sessions/[id]', { id: row.id })}{modeQuery}">
+						<a href="{resolve('/p/[steamid]/sessions/[id]', { steamid, id: row.id })}{modeQuery}">
 							{formatDay(row.startedAt, timeZone)}
 							<span class="muted">{formatClock(row.startedAt, timeZone)}</span>
 						</a>
