@@ -1,0 +1,56 @@
+{
+	"basic": {
+		"avatar": "https://avatars.steamstatic.com/a5f1befcb9aa4e4dc5832123db7bff6f3d358e0a_full.jpg",
+		"name": "keNb",
+		"steamid64": "76561198011868904",
+		"country": "tr",
+		"friends": {},
+		"friends_servers_online": {}
+	},
+	"statistics": {
+		"modes": {
+			"11": {
+				"general": {
+					"playtime": 750461,
+					"rounds_ct": 2,
+					"rounds_t": 58,
+					"bomb_defused": 0,
+					"bomb_planted": 0,
+					"kills": 110275,
+					"hp": 14384810,
+					"headshots": 85131
+				}
+			}
+		}
+	},
+	"server": {
+		"players": 15,
+		"max_players": 16,
+		"map": "de_mirage",
+		"id_games": 2,
+		"server_ip": "162.55.2.53",
+		"server_port": 27034,
+		"mode": "DM",
+		"category": "16 SLOTS",
+		"num": 102,
+		"matches_id_lobby": null
+	},
+	"cybershoke": {
+		"global": {
+			"steam": "76561198011868904",
+			"name": "keNb",
+			"value": 110872,
+			"rank": 13,
+			"kills": 110875,
+			"deaths": "60890",
+			"shoots": 1182801,
+			"hits": 273890,
+			"headshots": 85626,
+			"assists": 0,
+			"round_win": 0,
+			"round_lose": 0,
+			"playtime": "756979",
+			"lastconnect": 1793139583
+		}
+	}
+}

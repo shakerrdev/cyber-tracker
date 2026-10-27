@@ -1,0 +1,277 @@
+{
+	"basic": {
+		"avatar": "https://avatars.steamstatic.com/f902ed188cadb9e5f8e9dd1b591f7c6421065484_full.jpg",
+		"country": "de",
+		"name_unique": "shaker",
+		"name": "shaker",
+		"steamid64": "76561198056395137",
+		"vip_group": null,
+		"vip_name": null,
+		"connect": {
+			"faceit": {
+				"name": "-shaker-",
+				"url": "https://www.faceit.com/ru/players/-shaker-",
+				"skill_level": 9,
+				"elo": 1773,
+				"hide": false
+			}
+		},
+		"friends": {},
+		"friends_site_online": [],
+		"friends_servers_online": {},
+		"bans_list": [],
+		"web": {},
+		"prime": true
+	},
+	"statistics": {
+		"modes": {
+			"0": {
+				"general": { "kills": 61726, "headshots": 42343, "hp": 16352834, "playtime": 896129 },
+				"weapons": {
+					"weapon_ak47": {
+						"kills": 43803,
+						"headshots": 32033,
+						"shoots": 470228,
+						"hits": 116936,
+						"hp": 5530209,
+						"hits_head": 33354,
+						"hits_chest": 52805,
+						"hits_belly": 13868,
+						"hits_left_arm": 3353,
+						"hits_right_arm": 8540,
+						"hits_left_leg": 1743,
+						"hits_right_leg": 2196,
+						"hits_neak": 754,
+						"ttk_count": 173,
+						"ttk_instant": 0,
+						"ttk_sum_ms": 154777,
+						"reaction_count": 291,
+						"reaction_instant": 0,
+						"reaction_sum_ms": 138892,
+						"ttd_count": 222,
+						"ttd_instant": 0,
+						"ttd_sum_ms": 139503,
+						"ttk_ms": 895,
+						"reaction_ms": 477,
+						"ttd_ms": 628,
+						"unixtime_lastupdate": 1637784995
+					}
+				},
+				"web": {}
+			},
+			"11": {
+				"web": {},
+				"maps": {
+					"de_mirage": {
+						"kills": 28902,
+						"rounds_ct": 5,
+						"rounds_t": 22,
+						"bomb_defused": 0,
+						"bomb_planted": 0,
+						"playtime": 327334
+					},
+					"de_dust2": {
+						"kills": 9517,
+						"rounds_ct": 2,
+						"rounds_t": 3,
+						"bomb_defused": 0,
+						"bomb_planted": 0,
+						"playtime": 89999
+					}
+				},
+				"clutches": {},
+				"weapons": {
+					"weapon_ak47": {
+						"kills": 34990,
+						"headshots": 24376,
+						"shoots": 368798,
+						"hits": 93601,
+						"hp": 4491384,
+						"hits_head": 25229,
+						"hits_chest": 42855,
+						"hits_belly": 11711,
+						"hits_left_arm": 2762,
+						"hits_right_arm": 6863,
+						"hits_left_leg": 1441,
+						"hits_right_leg": 1823,
+						"hits_neak": 594,
+						"ttk_count": 115,
+						"ttk_instant": 0,
+						"ttk_sum_ms": 102818,
+						"reaction_count": 197,
+						"reaction_instant": 0,
+						"reaction_sum_ms": 96918,
+						"ttd_count": 147,
+						"ttd_instant": 0,
+						"ttd_sum_ms": 92260,
+						"ttk_ms": 894,
+						"reaction_ms": 492,
+						"ttd_ms": 628,
+						"unixtime_lastupdate": 1793095105
+					},
+					"weapon_deagle": {
+						"kills": 2873,
+						"headshots": 2437,
+						"shoots": 15538,
+						"hits": 5507,
+						"hp": 492764,
+						"hits_head": 2525,
+						"hits_chest": 2239,
+						"hits_belly": 274,
+						"hits_left_arm": 101,
+						"hits_right_arm": 262,
+						"hits_left_leg": 20,
+						"hits_right_leg": 26,
+						"hits_neak": 60,
+						"ttk_count": 20,
+						"ttk_instant": 0,
+						"ttk_sum_ms": 23155,
+						"reaction_count": 42,
+						"reaction_instant": 0,
+						"reaction_sum_ms": 24253,
+						"ttd_count": 23,
+						"ttd_instant": 0,
+						"ttd_sum_ms": 15594,
+						"ttk_ms": 1158,
+						"reaction_ms": 577,
+						"ttd_ms": 678,
+						"unixtime_lastupdate": 1792446536
+					}
+				},
+				"general": {
+					"playtime": 481805,
+					"rounds_ct": 7,
+					"rounds_t": 27,
+					"bomb_defused": 0,
+					"bomb_planted": 0,
+					"kills": 44430,
+					"hp": 5961524,
+					"headshots": 29231
+				},
+				"killstreaks": { "2": 4701, "3": 2299, "4": 1184, "5": 558, "31": 2 },
+				"internal": {}
+			},
+			"15": {
+				"web": {},
+				"maps": {
+					"de_mirage": {
+						"kills": 2930,
+						"rounds_ct": 0,
+						"rounds_t": 0,
+						"bomb_defused": 0,
+						"bomb_planted": 0,
+						"playtime": 32500
+					}
+				},
+				"clutches": {},
+				"weapons": {
+					"weapon_ak47": {
+						"kills": 5696,
+						"headshots": 5696,
+						"shoots": 52852,
+						"hits": 13567,
+						"hp": 624001,
+						"hits_head": 5913,
+						"hits_chest": 5574,
+						"hits_belly": 600,
+						"hits_left_arm": 289,
+						"hits_right_arm": 885,
+						"hits_left_leg": 76,
+						"hits_right_leg": 105,
+						"hits_neak": 125,
+						"ttk_count": 58,
+						"ttk_instant": 0,
+						"ttk_sum_ms": 51959,
+						"reaction_count": 94,
+						"reaction_instant": 0,
+						"reaction_sum_ms": 41974,
+						"ttd_count": 75,
+						"ttd_instant": 0,
+						"ttd_sum_ms": 47243,
+						"ttk_ms": 896,
+						"reaction_ms": 447,
+						"ttd_ms": 630,
+						"unixtime_lastupdate": 1793135349
+					}
+				},
+				"general": {
+					"playtime": 65249,
+					"rounds_ct": 0,
+					"rounds_t": 1,
+					"bomb_defused": 0,
+					"bomb_planted": 0,
+					"kills": 6206,
+					"hp": 717219,
+					"headshots": 6206
+				},
+				"killstreaks": { "2": 651, "3": 376 },
+				"internal": {}
+			},
+			"18": {
+				"web": {},
+				"maps": {
+					"kz_floatingislands": {
+						"kills": 0,
+						"rounds_ct": 0,
+						"rounds_t": 0,
+						"bomb_defused": 0,
+						"bomb_planted": 0,
+						"playtime": 728
+					}
+				},
+				"clutches": {},
+				"weapons": {},
+				"general": {
+					"kills": 0,
+					"hp": 0,
+					"headshots": 0,
+					"playtime": 950,
+					"rounds_ct": 0,
+					"rounds_t": 0,
+					"bomb_defused": 0,
+					"bomb_planted": 0
+				},
+				"killstreaks": {},
+				"internal": {}
+			},
+			"29": {
+				"web": {},
+				"maps": {},
+				"clutches": { "0": 0, "1": 0, "2": 112, "3": 18, "4": 2, "5": 0 },
+				"weapons": [],
+				"general": {
+					"kills": 4098,
+					"hp": 542539,
+					"headshots": 2131,
+					"playtime": 196189,
+					"rounds_ct": 1677,
+					"rounds_t": 1416,
+					"bomb_defused": 297,
+					"bomb_planted": 1020
+				},
+				"killstreaks": { "2": 552, "3": 139, "4": 12 },
+				"internal": {}
+			}
+		}
+	},
+	"server": {},
+	"cybershoke": {
+		"global": {
+			"steam": "76561198056395137",
+			"name": "shaker",
+			"value": 61726,
+			"rank": 9,
+			"kills": 61726,
+			"deaths": "54890",
+			"shoots": 632647,
+			"hits": 161980,
+			"headshots": 42343,
+			"assists": 0,
+			"round_win": 0,
+			"round_lose": 0,
+			"playtime": "896129",
+			"lastconnect": 1793135349
+		},
+		"top": { "global": 69534 }
+	}
+}

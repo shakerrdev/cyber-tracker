@@ -1,0 +1,16 @@
+{
+	"basic": {
+		"avatar": "https://avatars.steamstatic.com/0000000000000000000000000000000000000000_full.jpg",
+		"name": "Flierax",
+		"steamid64": "76561198966656353"
+	},
+	"server": {
+		"players": 1,
+		"max_players": 16,
+		"map": "duels_nuke_1x1",
+		"id_games": 2,
+		"matches_id_lobby": null,
+		"hide_type": 1
+	},
+	"cybershoke": { "global": { "lastconnect": 1793139572 } }
+}
