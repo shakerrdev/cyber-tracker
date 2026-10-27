@@ -27,6 +27,12 @@ export interface CybershokeClient {
 	server(ip: string, port: number): Promise<RawServerData>;
 }
 
+function describeFetchError(error: unknown): string {
+	const err = error as Error & { cause?: { code?: string; message?: string } };
+	const detail = err.cause?.code ?? err.cause?.message;
+	return detail ? `${err.message} (${detail})` : err.message;
+}
+
 const USER_AGENT =
 	'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0 Safari/537.36';
 
@@ -52,8 +58,8 @@ export function createClient({
 				},
 				signal: AbortSignal.timeout(timeoutMs)
 			});
-		} catch (cause) {
-			throw new CybershokeError(`${path}: ${(cause as Error).message}`);
+		} catch (error) {
+			throw new CybershokeError(`${path}: ${describeFetchError(error)}`);
 		}
 
 		if (!response.ok) {
