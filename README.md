@@ -25,9 +25,17 @@ The image is built by GitHub Actions and published to `ghcr.io/shakerrdev/cyber-
 
 1. Make the image public once: GHCR packages start private even for a public repo. Go to github.com/users/shakerrdev/packages/container/cyber-tracker/settings and choose Change visibility. Otherwise log in on the NAS with a token that has `read:packages`: `docker login ghcr.io -u shakerrdev`.
 2. On UGOS: Docker, Project, Create, paste [docker-compose.yml](docker-compose.yml), set `STEAMID64`, Deploy. Anywhere else: `docker compose up -d` next to the file.
-3. Open `http://<nas-ip>:3000`.
+3. Open `https://obelix:3010` (or whatever your NAS is called).
 
-To update, pull the new image and redeploy the project. To build on the NAS from a clone instead, use `docker compose up -d --build`.
+To update, pull the new image and redeploy the project. To build it yourself instead: `docker build -t ghcr.io/shakerrdev/cyber-tracker:latest .` before deploying.
+
+### HTTPS
+
+The app serves HTTPS on its port and redirects plain `http://` requests there (`/api/status` stays reachable over HTTP for the healthcheck). Certificates are signed for every local name you open it by (`obelix`, `nas.local`, `localhost`, plus the addresses in `TLS_HOSTS`).
+
+By default it signs them with cs-demo-cloud's certificate authority, which your devices already trust: the compose file mounts `../cs-demo-cloud/data/tls` read-only at `/ca`. If cs-demo-cloud's project folder isn't next to this one, set `CA_PATH` to its `data/tls` folder. Without a usable CA there, the app creates its own in `/data/tls` and logs that browsers will warn until that one is installed. The log's first lines say which CA is in use.
+
+With a real certificate, set `TLS_CERT` and `TLS_KEY` instead. `HTTPS=off` serves plain HTTP.
 
 The database lives in the `data` volume (`/data/cyber-tracker.db`, SQLite). Back up that volume to keep your history.
 
@@ -40,7 +48,11 @@ It must run somewhere that can reach cybershoke.net, such as the home network. K
 | `STEAMID64`                 | required                 | The player to track                             |
 | `TZ`                        | `Europe/Berlin`          | Time zone for dates on the dashboard            |
 | `DATA_DIR`                  | `/data` in the image     | Where the SQLite database goes                  |
-| `PORT`                      | `3000`                   | HTTP port                                       |
+| `PORT`                      | `3010` in compose        | Port on the NAS                                 |
+| `TLS_CA_DIR`                | `/ca` in compose         | Folder with an existing `ca.crt` and `ca.key`   |
+| `TLS_HOSTS`                 | empty                    | IPs or extra names for the certificate          |
+| `TLS_CERT`/`TLS_KEY`        | empty                    | Your own certificate instead                    |
+| `HTTPS`                     | `on`                     | `off` serves plain HTTP                         |
 | `PROFILE_INTERVAL_SEC`      | `60`                     | Profile check interval while active             |
 | `IDLE_PROFILE_INTERVAL_SEC` | `180`                    | Profile check interval after 30 minutes offline |
 | `LIVE_INTERVAL_SEC`         | `20`                     | Scoreboard check interval while in game         |

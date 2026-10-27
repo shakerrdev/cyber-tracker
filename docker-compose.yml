@@ -1,16 +1,18 @@
 services:
   cyber-tracker:
     image: ghcr.io/shakerrdev/cyber-tracker:latest
-    build: .
     container_name: cyber-tracker
     restart: unless-stopped
     ports:
-      - '3000:3000'
+      - '${PORT:-3010}:3000'
     environment:
       STEAMID64: '76561198056395137'
       TZ: Europe/Berlin
+      TLS_CA_DIR: /ca
+      TLS_HOSTS: ${TLS_HOSTS:-}
     volumes:
       - data:/data
+      - ${CA_PATH:-../cs-demo-cloud/data/tls}:/ca:ro
 
 volumes:
   data:
