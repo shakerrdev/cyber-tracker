@@ -15,6 +15,9 @@ export const actions: Actions = {
 			throw error;
 		}
 	},
+	demo: async () => {
+		redirect(303, `/p/${app().players.addDemo()}`);
+	},
 	remove: async ({ request }) => {
 		const id = String((await request.formData()).get('steamid64') ?? '');
 		app().players.remove(id);

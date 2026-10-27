@@ -1,4 +1,5 @@
 import { app } from '#lib/server/app.ts';
+import { isDemo } from '#lib/server/demo/demo.ts';
 import type { PlayerView } from '#lib/views.ts';
 import type { LayoutServerLoad } from './$types';
 
@@ -8,6 +9,7 @@ export const load: LayoutServerLoad = () => {
 		const status = players.status(steamid64);
 		return {
 			steamid64,
+			demo: isDemo(steamid64),
 			info: store.player(steamid64),
 			status: status && {
 				state: status.state,

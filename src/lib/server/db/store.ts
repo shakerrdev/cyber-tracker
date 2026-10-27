@@ -109,6 +109,13 @@ export class Store {
 		return Number(result.changes) > 0;
 	}
 
+	purge(steamid64: string) {
+		for (const table of ['tracked', 'live_sample', 'snapshot', 'player']) {
+			this.db.prepare(`delete from ${table} where steamid64 = ?`).run(steamid64);
+		}
+		this.revision++;
+	}
+
 	latestSnapshot(steamid64: string): Snapshot | null {
 		const row = this.db
 			.prepare(

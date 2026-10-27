@@ -1,5 +1,6 @@
 import { CybershokeError, type CybershokeClient } from '../cybershoke/client.ts';
 import type { Store } from '../db/store.ts';
+import { createDemo, DEMO_ID, isDemo } from '../demo/demo.ts';
 import { Ingestor } from '../tracker/ingest.ts';
 import { Tracker, type TrackerStatus } from '../tracker/tracker.ts';
 import { PlayerInputError, resolveSteamId, type FetchText } from './resolve.ts';
@@ -29,7 +30,18 @@ export class PlayerManager {
 		if (this.opts.store.tracked().length === 0) {
 			for (const id of initialPlayers) this.opts.store.track(id, this.now());
 		}
-		for (const id of this.opts.store.tracked()) this.startTracker(id);
+		for (const id of this.opts.store.tracked()) {
+			if (isDemo(id)) this.addDemo();
+			else this.startTracker(id, this.opts.client);
+		}
+	}
+
+	addDemo(): string {
+		this.trackers.get(DEMO_ID)?.stop();
+		this.trackers.delete(DEMO_ID);
+		const client = createDemo(this.opts.store, this.now());
+		this.startTracker(DEMO_ID, client, true);
+		return DEMO_ID;
 	}
 
 	stop() {
@@ -65,20 +77,21 @@ export class PlayerManager {
 		}
 		new Ingestor(this.opts.store, id).profile(raw, this.now());
 		this.opts.store.track(id, this.now());
-		this.startTracker(id);
+		this.startTracker(id, this.opts.client);
 		return id;
 	}
 
 	remove(steamid64: string) {
-		this.opts.store.untrack(steamid64);
+		if (isDemo(steamid64)) this.opts.store.purge(steamid64);
+		else this.opts.store.untrack(steamid64);
 		this.trackers.get(steamid64)?.stop();
 		this.trackers.delete(steamid64);
 	}
 
-	private startTracker(id: string) {
+	private startTracker(id: string, client: CybershokeClient, always = false) {
 		if (this.trackers.has(id)) return;
 		const tracker = new Tracker({
-			client: this.opts.client,
+			client,
 			ingestor: new Ingestor(this.opts.store, id),
 			steamid64: id,
 			profileIntervalSec: this.opts.profileIntervalSec,
@@ -87,6 +100,6 @@ export class PlayerManager {
 			log: (message) => console.log(`[tracker ${id}] ${message}`)
 		});
 		this.trackers.set(id, tracker);
-		if (this.opts.enabled) tracker.start();
+		if (this.opts.enabled || always) tracker.start();
 	}
 }

@@ -19,13 +19,15 @@
 		{/if}
 		<div>
 			<h1>{info?.name ?? player.steamid64}</h1>
-			{#if info?.faceitLevel}
+			{#if player.demo}
+				<p class="muted">Simulated player, regenerated on every restart</p>
+			{:else if info?.faceitLevel}
 				<p class="muted">FACEIT {info.faceitLevel}, {info.faceitElo} Elo</p>
 			{/if}
 		</div>
 	</div>
 	<TrackerStatus
-		enabled={data.trackerEnabled}
+		enabled={data.trackerEnabled || player.demo}
 		state={player.status?.state ?? 'starting'}
 		presence={player.status?.presence ?? null}
 		live={player.status?.live ?? null}

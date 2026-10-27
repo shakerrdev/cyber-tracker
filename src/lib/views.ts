@@ -65,6 +65,7 @@ export interface MapRow {
 
 export interface PlayerView {
 	steamid64: string;
+	demo: boolean;
 	info: PlayerInfo | null;
 	status: {
 		state: string;

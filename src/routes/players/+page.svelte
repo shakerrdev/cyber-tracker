@@ -10,10 +10,12 @@
 
 	let adding = $state(false);
 	let confirming = $state<string | null>(null);
+	let seeding = $state(false);
+	const hasDemo = $derived(data.players.some((p) => p.demo));
 
 	function statusText(player: PlayerView): string {
 		const s = player.status;
-		if (!data.trackerEnabled) return 'Tracker paused';
+		if (!data.trackerEnabled && !player.demo) return 'Tracker paused';
 		if (!s || s.state === 'starting') return 'Checking Cybershoke…';
 		if (s.state === 'in_game' && s.presence?.kind === 'server') {
 			const mode = modeByKey(s.presence.modeKey)?.label ?? s.presence.modeKey;
@@ -75,6 +77,30 @@
 	{/if}
 </form>
 
+{#if !hasDemo}
+	<form
+		method="POST"
+		action="?/demo"
+		class="demo"
+		use:enhance={() => {
+			seeding = true;
+			return async ({ update }) => {
+				await update();
+				seeding = false;
+			};
+		}}
+	>
+		<div>
+			<p class="demo-title">Try it with a demo player</p>
+			<p class="muted">
+				Adds a simulated player with 60 days of history who keeps playing DM, HS DM, Pistol DM and
+				Retake right now, so the live view, compare page and session pages all have data.
+			</p>
+		</div>
+		<button type="submit" disabled={seeding}>{seeding ? 'Generating…' : 'Add demo player'}</button>
+	</form>
+{/if}
+
 {#if data.players.length === 0}
 	<p class="muted empty">Nobody is tracked yet. Add yourself first.</p>
 {:else}
@@ -105,7 +131,9 @@
 				>
 					<input type="hidden" name="steamid64" value={player.steamid64} />
 					{#if confirming === player.steamid64}
-						<span class="secondary confirm">Their history is kept.</span>
+						<span class="secondary confirm"
+							>{player.demo ? 'Its simulated history is deleted.' : 'Their history is kept.'}</span
+						>
 						<button type="submit" class="danger">Stop tracking</button>
 						<button type="button" class="quiet" onclick={() => (confirming = null)}>Cancel</button>
 					{:else}
@@ -263,6 +291,31 @@
 	}
 
 	.confirm {
+		font-size: 0.875rem;
+	}
+
+	.demo {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px 20px;
+		flex-wrap: wrap;
+		max-width: 720px;
+		border: 1px dashed var(--rule);
+		border-radius: var(--radius);
+		padding: 16px 20px;
+		margin: -12px 0 32px;
+	}
+
+	.demo div {
+		flex: 1 1 320px;
+	}
+
+	.demo-title {
+		font-weight: 500;
+	}
+
+	.demo .muted {
 		font-size: 0.875rem;
 	}
 
