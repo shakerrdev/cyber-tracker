@@ -1,0 +1,151 @@
+:root {
+	color-scheme: light;
+	--page: #e8ecf0;
+	--panel: #fafbfc;
+	--panel-raised: #ffffff;
+	--rule: #d3dae1;
+	--grid: #e3e8ed;
+	--ink: #17202a;
+	--ink-2: #4a5764;
+	--ink-3: #6f7b87;
+	--kill: #b36f07;
+	--kill-wash: rgb(179 111 7 / 0.1);
+	--death: #3d63a6;
+	--dot: #8c97a3;
+	--good: #1f7a3d;
+	--bad: #b23a2e;
+	--focus: #3d63a6;
+
+	--font: 'Barlow', system-ui, sans-serif;
+	--font-condensed: 'Barlow Condensed', 'Barlow', system-ui, sans-serif;
+	--radius: 6px;
+	--gutter: 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		color-scheme: dark;
+		--page: #171c22;
+		--panel: #1f252d;
+		--panel-raised: #252c35;
+		--rule: #2e3742;
+		--grid: #29313b;
+		--ink: #e9edf1;
+		--ink-2: #a7b1bc;
+		--ink-3: #7c8894;
+		--kill: #c8801a;
+		--kill-wash: rgb(200 128 26 / 0.12);
+		--death: #4a82e0;
+		--dot: #6a7682;
+		--good: #4fb36d;
+		--bad: #e06a5c;
+		--focus: #6d9cf0;
+	}
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	background: var(--page);
+	color: var(--ink);
+	font-family: var(--font);
+	font-size: 16px;
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+}
+
+body {
+	margin: 0;
+	min-height: 100vh;
+	background: var(--page);
+}
+
+a {
+	color: inherit;
+}
+
+:focus-visible {
+	outline: 2px solid var(--focus);
+	outline-offset: 2px;
+	border-radius: 2px;
+}
+
+h1,
+h2,
+h3 {
+	font-family: var(--font-condensed);
+	font-weight: 600;
+	line-height: 1.15;
+	margin: 0;
+}
+
+h2 {
+	font-size: 1.5rem;
+	letter-spacing: 0.005em;
+}
+
+h3 {
+	font-size: 1.125rem;
+}
+
+p {
+	margin: 0;
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+	font-variant-numeric: tabular-nums;
+}
+
+th {
+	font-weight: 500;
+	color: var(--ink-3);
+	font-size: 0.875rem;
+	text-align: left;
+	padding: 0 12px 8px 0;
+	border-bottom: 1px solid var(--rule);
+	white-space: nowrap;
+}
+
+td {
+	padding: 10px 12px 10px 0;
+	border-bottom: 1px solid var(--grid);
+	white-space: nowrap;
+}
+
+th.num,
+td.num {
+	text-align: right;
+}
+
+.muted {
+	color: var(--ink-3);
+}
+
+.secondary {
+	color: var(--ink-2);
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation: none !important;
+		transition: none !important;
+	}
+}
