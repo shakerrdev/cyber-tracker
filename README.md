@@ -23,11 +23,11 @@ Cybershoke only reports deaths as an all-mode total. When you played more than o
 
 The image is built by GitHub Actions and published to `ghcr.io/shakerrdev/cyber-tracker` for amd64 and arm64.
 
-1. Copy [docker-compose.yml](docker-compose.yml) to the NAS and set `STEAMID64`.
-2. Start it with `docker compose up -d` (or create a project from the file in the NAS's Docker app).
+1. Make the image public once: GHCR packages start private even for a public repo. Go to github.com/users/shakerrdev/packages/container/cyber-tracker/settings and choose Change visibility. Otherwise log in on the NAS with a token that has `read:packages`: `docker login ghcr.io -u shakerrdev`.
+2. On UGOS: Docker, Project, Create, paste [docker-compose.yml](docker-compose.yml), set `STEAMID64`, Deploy. Anywhere else: `docker compose up -d` next to the file.
 3. Open `http://<nas-ip>:3000`.
 
-If the repository is private, the image is too. Log in once with a GitHub token that has `read:packages`: `docker login ghcr.io -u shakerrdev`. Alternatively, build it on the NAS from a clone with `docker compose up -d --build`.
+To update, pull the new image and redeploy the project. To build on the NAS from a clone instead, use `docker compose up -d --build`.
 
 The database lives in the `data` volume (`/data/cyber-tracker.db`, SQLite). Back up that volume to keep your history.
 
