@@ -13,7 +13,10 @@
 		"test:unit": "vitest",
 		"test": "npm run test:unit -- --run",
 		"lint": "prettier --check .",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"start": "node --disable-warning=ExperimentalWarning build",
+		"sim": "node scripts/fake-cybershoke.ts",
+		"seed:demo": "node --disable-warning=ExperimentalWarning scripts/seed-demo.ts"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-node": "^6.0.0",
