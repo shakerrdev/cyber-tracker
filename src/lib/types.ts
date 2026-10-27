@@ -109,3 +109,63 @@ export interface Snapshot {
 	takenAt: number;
 	stats: StatsSnapshot;
 }
+
+export interface CurvePoint {
+	t: number;
+	kills: number;
+	deaths: number;
+	headshots: number;
+}
+
+export interface Stint {
+	modeId: number;
+	serverIp: string;
+	serverPort: number;
+	serverNum: number | null;
+	maps: string[];
+	startedAt: number;
+	endedAt: number;
+	kills: number;
+	deaths: number;
+	headshots: number;
+	seconds: number;
+	pointsStart: number | null;
+	pointsEnd: number | null;
+	rank: number | null;
+	ttkMs: number | null;
+	curve: CurvePoint[];
+}
+
+export interface ModeTotals {
+	modeId: number;
+	kills: number;
+	deaths: number;
+	headshots: number;
+	damage: number;
+	playtime: number;
+	shots: number;
+	hits: number;
+	hitsHead: number;
+	ttkCount: number;
+	ttkSumMs: number;
+	roundsCt: number;
+	roundsT: number;
+	bombDefused: number;
+	bombPlanted: number;
+	weapons: Record<string, WeaponCounters>;
+	maps: Record<string, MapCounters>;
+	killstreaks: Record<string, number>;
+	clutches: Record<string, number>;
+	provisional: boolean;
+	pointsBefore: number | null;
+	pointsAfter: number | null;
+}
+
+export interface Session {
+	id: string;
+	startedAt: number;
+	endedAt: number;
+	inProgress: boolean;
+	modes: ModeTotals[];
+	stints: Stint[];
+}

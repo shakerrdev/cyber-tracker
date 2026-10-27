@@ -3,6 +3,7 @@ import { config, type Config } from './config.ts';
 import { createClient } from './cybershoke/client.ts';
 import { openDatabase } from './db/database.ts';
 import { Store } from './db/store.ts';
+import { StatsService } from './stats/service.ts';
 import { Ingestor } from './tracker/ingest.ts';
 import { Tracker } from './tracker/tracker.ts';
 
@@ -10,6 +11,7 @@ export interface App {
 	config: Config;
 	store: Store;
 	tracker: Tracker;
+	stats: StatsService;
 }
 
 const key = Symbol.for('cyber-tracker.app');
@@ -30,7 +32,8 @@ export function app(): App {
 		liveIntervalSec: cfg.liveIntervalSec
 	});
 
-	const instance: App = { config: cfg, store, tracker };
+	const stats = new StatsService(store, cfg.steamid64, cfg.sessionGapMin * 60);
+	const instance: App = { config: cfg, store, tracker, stats };
 	holder[key] = instance;
 
 	if (cfg.trackerEnabled) tracker.start();
