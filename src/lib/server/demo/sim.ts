@@ -3,8 +3,8 @@ import type {
 	RawProfile,
 	RawServerData,
 	RawServerPlayer
-} from '../../src/lib/server/cybershoke/types.ts';
-import { modeById } from '../../src/lib/modes.ts';
+} from '../cybershoke/types.ts';
+import { modeById } from '#lib/modes.ts';
 
 export function rng(seed: number) {
 	let a = seed >>> 0;

@@ -1,5 +1,5 @@
 import { createServer, type IncomingMessage } from 'node:http';
-import { DEFAULT_AVATAR, SimPlayer } from './sim/player.ts';
+import { DEFAULT_AVATAR, SimPlayer } from '../src/lib/server/demo/sim.ts';
 
 const port = Number(process.env.FAKE_PORT ?? 8787);
 const ids = (process.env.STEAMID64 ?? '76561198056395137').split(/[\s,]+/).filter(Boolean);
@@ -79,7 +79,7 @@ createServer(async (req, res) => {
 			const { ip, port: serverPort } = JSON.parse(await body(req)) as { ip: string; port: number };
 			for (const sim of sims.values()) {
 				const data = sim.player.server(ip, serverPort, now());
-				if (data.playersv2.length) return send(200, data);
+				if (data.playersv2?.length) return send(200, data);
 			}
 			return send(200, { serversv2: {}, playersv2: [] });
 		}
