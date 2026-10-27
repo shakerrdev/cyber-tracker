@@ -59,7 +59,7 @@ function totals(
 	counters: ModeCounters,
 	deaths: number,
 	extra: LiveExtra | undefined,
-	points: { before: number | null; after: number | null }
+	points: { before: number | null; after: number | null; final: boolean }
 ): ModeTotals {
 	const w = sumWeapons(counters.weapons);
 	const g = counters.general;
@@ -85,13 +85,14 @@ function totals(
 		clutches: counters.clutches,
 		provisional: extra !== undefined,
 		pointsBefore: points.before,
-		pointsAfter: points.after
+		pointsAfter: points.after,
+		pointsFinal: points.final
 	};
 }
 
 function pointsFor(groups: Group[], index: number, modeId: number) {
 	const inSession = groups[index].stints.filter((s) => s.modeId === modeId);
-	if (inSession.length === 0) return { before: null, after: null };
+	if (inSession.length === 0) return { before: null, after: null, final: false };
 	const before = inSession.find((s) => s.pointsStart !== null)?.pointsStart ?? null;
 	let after: number | null = null;
 	for (const later of groups.slice(index + 1)) {
@@ -99,8 +100,9 @@ function pointsFor(groups: Group[], index: number, modeId: number) {
 			later.stints.find((s) => s.modeId === modeId && s.pointsStart !== null)?.pointsStart ?? null;
 		if (after !== null) break;
 	}
+	const final = after !== null;
 	after ??= inSession.findLast((s) => s.pointsEnd !== null)?.pointsEnd ?? null;
-	return { before, after };
+	return { before, after, final };
 }
 
 export function buildSessions(

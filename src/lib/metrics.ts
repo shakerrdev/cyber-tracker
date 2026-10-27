@@ -16,6 +16,7 @@ export interface Metrics {
 	dpm: number | null;
 	ttkMs: number | null;
 	pointsDelta: number | null;
+	pointsFinal: boolean;
 }
 
 function ratio(a: number, b: number): number | null {
@@ -67,7 +68,8 @@ export function combine(modes: ModeTotals[]): Totals {
 		killstreaks: {},
 		clutches: {},
 		provisional: false,
-		pointsDelta: null
+		pointsDelta: null,
+		pointsFinal: true
 	};
 	return modes.reduce<Totals>((acc, m) => {
 		const delta =
@@ -92,7 +94,8 @@ export function combine(modes: ModeTotals[]): Totals {
 			killstreaks: mergeNumbers(acc.killstreaks, m.killstreaks),
 			clutches: mergeNumbers(acc.clutches, m.clutches),
 			provisional: acc.provisional || m.provisional,
-			pointsDelta: delta === null ? acc.pointsDelta : (acc.pointsDelta ?? 0) + delta
+			pointsDelta: delta === null ? acc.pointsDelta : (acc.pointsDelta ?? 0) + delta,
+			pointsFinal: delta === null ? acc.pointsFinal : acc.pointsFinal && m.pointsFinal
 		};
 	}, base);
 }
@@ -110,7 +113,8 @@ export function metrics(t: Totals): Metrics {
 		headHitPct: ratio(t.hitsHead, t.hits),
 		dpm: minutes >= 1 && t.damage > 0 ? t.damage / minutes : null,
 		ttkMs: ratio(t.ttkSumMs, t.ttkCount),
-		pointsDelta: t.pointsDelta
+		pointsDelta: t.pointsDelta,
+		pointsFinal: t.pointsFinal
 	};
 }
 

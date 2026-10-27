@@ -159,6 +159,7 @@ export interface ModeTotals {
 	provisional: boolean;
 	pointsBefore: number | null;
 	pointsAfter: number | null;
+	pointsFinal: boolean;
 }
 
 export interface Session {

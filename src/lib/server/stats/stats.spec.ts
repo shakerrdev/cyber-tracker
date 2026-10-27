@@ -217,8 +217,16 @@ describe('buildSessions', () => {
 
 		const sessions = buildSessions([base], samples, { gapSec: 1800, liveActive: false });
 
-		expect(sessions[0].modes[0]).toMatchObject({ pointsBefore: 1000, pointsAfter: 1042 });
-		expect(sessions[1].modes[0]).toMatchObject({ pointsBefore: 1042, pointsAfter: 1042 });
+		expect(sessions[0].modes[0]).toMatchObject({
+			pointsBefore: 1000,
+			pointsAfter: 1042,
+			pointsFinal: true
+		});
+		expect(sessions[1].modes[0]).toMatchObject({
+			pointsBefore: 1042,
+			pointsAfter: 1042,
+			pointsFinal: false
+		});
 	});
 });
 

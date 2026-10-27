@@ -29,7 +29,9 @@
 		{#if row.metrics.pointsDelta !== null}
 			<div class="tally">
 				<span class="mid">{signed(row.metrics.pointsDelta)}</span>
-				<span class="caption">rank points</span>
+				<span class="caption">
+					{row.metrics.pointsFinal ? 'rank points' : 'rank points so far'}
+				</span>
 			</div>
 		{/if}
 	</div>
