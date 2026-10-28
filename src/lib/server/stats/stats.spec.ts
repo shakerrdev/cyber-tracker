@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { combine, metrics } from '#lib/metrics.ts';
 import { WEAPON_FIELDS, type LiveSample, type Snapshot, type StatsSnapshot } from '#lib/types.ts';
 import { emptyMode, zero } from './counters.ts';
-import { apportion, diffSnapshots } from './deltas.ts';
+import { apportion, diffSnapshots, snapshotDeltas } from './deltas.ts';
 import { buildSessions } from './sessions.ts';
 import { buildStints } from './stints.ts';
 
@@ -78,6 +78,52 @@ describe('apportion', () => {
 		expect(apportion(10, { a: 1, b: 1, c: 1 })).toEqual({ a: 4, b: 3, c: 3 });
 		expect(apportion(7, { a: 3, b: 1 })).toEqual({ a: 5, b: 2 });
 		expect(apportion(5, { a: 0 })).toEqual({ a: 0 });
+	});
+});
+
+describe('snapshotDeltas', () => {
+	const start = snap(1, 0, 100, 1000, {
+		11: { kills: 50, playtime: 600 },
+		22: { kills: 5, playtime: 60 }
+	});
+	const dmFlushed = snap(2, 500, 130, 1480, {
+		11: { kills: 98, playtime: 1080 },
+		22: { kills: 5, playtime: 60 }
+	});
+	const pistolFlushed = snap(3, 900, 130, 1780, {
+		11: { kills: 98, playtime: 1080 },
+		22: { kills: 26, playtime: 360 }
+	});
+
+	it('gives deaths that show up after the kills to the last modes played', () => {
+		const deltas = snapshotDeltas([
+			start,
+			dmFlushed,
+			pistolFlushed,
+			snap(4, 1020, 147, 1780, {
+				11: { kills: 98, playtime: 1080 },
+				22: { kills: 26, playtime: 360 }
+			})
+		]);
+		expect(deltas).toHaveLength(2);
+		expect(deltas[0].modes['11'].deaths).toBe(30);
+		expect(deltas[1].modes['22'].deaths).toBe(17);
+		expect(deltas[1].globalDeaths).toBe(17);
+	});
+
+	it('leaves deaths from untracked modes and long after alone', () => {
+		const untracked = snap(4, 1020, 147, 1900, {
+			11: { kills: 98, playtime: 1080 },
+			22: { kills: 26, playtime: 360 }
+		});
+		const muchLater = snap(4, 900 + 3600, 147, 1780, {
+			11: { kills: 98, playtime: 1080 },
+			22: { kills: 26, playtime: 360 }
+		});
+		for (const last of [untracked, muchLater]) {
+			const deltas = snapshotDeltas([start, dmFlushed, pistolFlushed, last]);
+			expect(deltas[1].modes['22'].deaths).toBe(0);
+		}
 	});
 });
 

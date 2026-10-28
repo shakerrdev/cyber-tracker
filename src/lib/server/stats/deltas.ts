@@ -67,11 +67,25 @@ export function diffSnapshots(prev: Snapshot, next: Snapshot): SnapshotDelta {
 	};
 }
 
+const LATE_DEATHS_SEC = 15 * 60;
+
+function addLateDeaths(delta: SnapshotDelta, late: number, at: number) {
+	if (at - delta.to > LATE_DEATHS_SEC) return;
+	const weights = Object.fromEntries(
+		Object.entries(delta.modes).map(([id, m]) => [id, m.general.playtime || m.general.kills])
+	);
+	const extra = apportion(late, weights);
+	for (const [id, n] of Object.entries(extra)) delta.modes[id].deaths += n;
+	delta.globalDeaths += late;
+}
+
 export function snapshotDeltas(snapshots: Snapshot[]): SnapshotDelta[] {
 	const out: SnapshotDelta[] = [];
 	for (let i = 1; i < snapshots.length; i++) {
 		const delta = diffSnapshots(snapshots[i - 1], snapshots[i]);
 		if (Object.keys(delta.modes).length > 0) out.push(delta);
+		else if (delta.allModesPlaytime === 0 && delta.globalDeaths > 0 && out.length > 0)
+			addLateDeaths(out[out.length - 1], delta.globalDeaths, delta.to);
 	}
 	return out;
 }
