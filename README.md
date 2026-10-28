@@ -33,6 +33,8 @@ From that it builds:
 - **Sessions**: stints and profile changes less than 30 minutes apart.
 - **Session stats**: the profile difference once it's in (exact), or the live scoreboard while the player is still on the server (marked as live).
 
+Besides the normalized stats it keeps the untouched responses: every distinct profile response (`raw_profile`) and every scoreboard read (`raw_scoreboard`, the whole lobby), gzipped. Nothing reads them yet; they're there so new stats can be computed for the past later.
+
 Cybershoke only reports deaths as an all-mode total. When someone played more than one mode between two profile checks, the deaths are split by time played in each mode.
 
 ## Running it on the NAS
