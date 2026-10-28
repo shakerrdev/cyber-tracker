@@ -73,7 +73,9 @@ export function combine(modes: ModeTotals[]): Totals {
 	};
 	return modes.reduce<Totals>((acc, m) => {
 		const delta =
-			m.pointsBefore !== null && m.pointsAfter !== null ? m.pointsAfter - m.pointsBefore : null;
+			m.pointsFinal && m.pointsBefore !== null && m.pointsAfter !== null
+				? m.pointsAfter - m.pointsBefore
+				: null;
 		return {
 			kills: acc.kills + m.kills,
 			deaths: acc.deaths + m.deaths,

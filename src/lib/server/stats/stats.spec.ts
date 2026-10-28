@@ -307,6 +307,8 @@ describe('buildSessions', () => {
 			pointsAfter: 1042,
 			pointsFinal: false
 		});
+		expect(metrics(combine(sessions[0].modes)).pointsDelta).toBe(42);
+		expect(metrics(combine(sessions[1].modes)).pointsDelta).toBeNull();
 	});
 });
 
