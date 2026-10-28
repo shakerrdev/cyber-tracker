@@ -35,7 +35,7 @@ export interface CurveSegment {
 	modeId: number;
 	serverNum: number | null;
 	maps: string[];
-	points: { t: number; kills: number; deaths: number }[];
+	points: { t: number; kills: number; deaths: number; untracked?: boolean }[];
 }
 
 export interface TrendPoint {

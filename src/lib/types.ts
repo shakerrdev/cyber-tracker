@@ -115,6 +115,7 @@ export interface CurvePoint {
 	kills: number;
 	deaths: number;
 	headshots: number;
+	untracked?: boolean;
 }
 
 export interface Stint {

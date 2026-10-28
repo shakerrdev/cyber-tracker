@@ -45,7 +45,8 @@ export function curveFor(session: Session, modeIds: number[]): CurveSegment[] {
 				points: stint.curve.map((p) => ({
 					t: p.t,
 					kills: kills + p.kills,
-					deaths: deaths + p.deaths
+					deaths: deaths + p.deaths,
+					...(p.untracked && { untracked: true })
 				}))
 			};
 			kills += stint.kills;

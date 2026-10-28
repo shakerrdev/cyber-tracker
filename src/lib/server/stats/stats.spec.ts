@@ -159,6 +159,40 @@ describe('buildStints', () => {
 			[180, 2]
 		]);
 	});
+
+	it('marks the stretches the tracker did not see', () => {
+		const [late] = buildStints([
+			sample(1000, 9, 4, 600),
+			sample(1020, 10, 4, 620),
+			sample(1200, 14, 6, 800),
+			sample(1220, 15, 6, 820)
+		]);
+		expect(late.curve.map((p) => [p.t, !!p.untracked])).toEqual([
+			[400, false],
+			[1000, true],
+			[1020, false],
+			[1200, true],
+			[1220, false]
+		]);
+
+		const [early] = buildStints([sample(1000, 1, 0, 20), sample(1020, 2, 0, 40)]);
+		expect(early.curve.some((p) => p.untracked)).toBe(false);
+	});
+
+	it('keeps a gap marked when the score stays the same after it', () => {
+		const [stint] = buildStints([
+			sample(1000, 1, 0, 20),
+			sample(1200, 1, 0, 220),
+			sample(1220, 1, 0, 240),
+			sample(1240, 2, 0, 260)
+		]);
+		expect(stint.curve.map((p) => [p.t, !!p.untracked])).toEqual([
+			[980, false],
+			[1000, false],
+			[1220, true],
+			[1240, false]
+		]);
+	});
 });
 
 describe('buildSessions', () => {

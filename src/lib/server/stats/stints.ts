@@ -1,6 +1,7 @@
 import type { CurvePoint, LiveSample, Stint } from '#lib/types.ts';
 
 const REJOIN_TOLERANCE_SEC = 5;
+const UNTRACKED_GAP_SEC = 60;
 
 interface Builder {
 	stint: Stint;
@@ -33,7 +34,8 @@ function open(sample: LiveSample): Builder {
 					t: sample.takenAt,
 					kills: sample.kills,
 					deaths: sample.deaths,
-					headshots: sample.headshots
+					headshots: sample.headshots,
+					...(sample.seconds > UNTRACKED_GAP_SEC && { untracked: true })
 				}
 			]
 		},
@@ -71,9 +73,16 @@ function extend(b: Builder, s: LiveSample) {
 	if (s.rank !== null) st.rank = s.rank;
 	if (s.ttkMs !== null) st.ttkMs = s.ttkMs;
 	if (!st.maps.includes(s.map)) st.maps.push(s.map);
-	const point = { t: s.takenAt, kills: st.kills, deaths: st.deaths, headshots: st.headshots };
+	const point: CurvePoint = {
+		t: s.takenAt,
+		kills: st.kills,
+		deaths: st.deaths,
+		headshots: st.headshots
+	};
+	if (s.takenAt - b.last.takenAt > UNTRACKED_GAP_SEC) point.untracked = true;
 	const n = st.curve.length;
 	if (n >= 2 && sameScore(st.curve[n - 1], point) && sameScore(st.curve[n - 2], point)) {
+		if (st.curve[n - 1].untracked) point.untracked = true;
 		st.curve[n - 1] = point;
 	} else {
 		st.curve.push(point);
