@@ -35,8 +35,17 @@ export class Ingestor {
 	private readonly steamid64: string;
 	private readonly trackedIds: readonly number[];
 	private lastHash: string | null | undefined;
+	private lastRawHash: string | null | undefined;
 
-	constructor(store: Store, steamid64: string, trackedIds: readonly number[] = TRACKED_MODE_IDS) {
+	private readonly keepRaw: boolean;
+
+	constructor(
+		store: Store,
+		steamid64: string,
+		trackedIds: readonly number[] = TRACKED_MODE_IDS,
+		keepRaw = true
+	) {
+		this.keepRaw = keepRaw;
 		this.store = store;
 		this.steamid64 = steamid64;
 		this.trackedIds = trackedIds;
@@ -46,6 +55,8 @@ export class Ingestor {
 		if (raw.basic.steamid64 !== this.steamid64) {
 			throw new Error(`profile is for ${raw.basic.steamid64}, expected ${this.steamid64}`);
 		}
+		if (this.keepRaw) this.keepRawProfile(raw, at);
+
 		const player = extractPlayer(raw);
 		this.store.upsertPlayer(player, at);
 
@@ -61,12 +72,23 @@ export class Ingestor {
 		return { player, presence: extractPresence(raw), snapshotInserted };
 	}
 
+	private keepRawProfile(raw: RawProfile, at: number) {
+		const body = JSON.stringify(raw);
+		const hash = createHash('sha1').update(body).digest('hex');
+		this.lastRawHash ??= this.store.latestRawProfileHash(this.steamid64);
+		if (hash === this.lastRawHash) return;
+		this.store.insertRawProfile(this.steamid64, at, hash, body);
+		this.lastRawHash = hash;
+	}
+
 	live(
 		raw: RawServerData,
 		target: LiveTarget,
 		address: { ip: string; port: number },
 		at: number
 	): LiveSample | null {
+		if (this.keepRaw)
+			this.store.insertRawScoreboard(this.steamid64, at, address, JSON.stringify(raw));
 		const sample = extractLiveSample(raw, target, address, at);
 		if (sample && this.trackedIds.includes(sample.modeId)) {
 			this.store.insertSample(this.steamid64, sample);

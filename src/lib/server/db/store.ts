@@ -110,7 +110,14 @@ export class Store {
 	}
 
 	purge(steamid64: string) {
-		for (const table of ['tracked', 'live_sample', 'snapshot', 'player']) {
+		for (const table of [
+			'tracked',
+			'live_sample',
+			'snapshot',
+			'raw_profile',
+			'raw_scoreboard',
+			'player'
+		]) {
 			this.db.prepare(`delete from ${table} where steamid64 = ?`).run(steamid64);
 		}
 		this.revision++;
@@ -144,6 +151,56 @@ export class Store {
 			.prepare('insert into snapshot (steamid64, taken_at, hash, stats) values (?, ?, ?, ?)')
 			.run(steamid64, takenAt, hash, gzipSync(JSON.stringify(stats)));
 		this.revision++;
+	}
+
+	latestRawProfileHash(steamid64: string): string | null {
+		const row = this.db
+			.prepare(
+				'select hash from raw_profile where steamid64 = ? order by taken_at desc, id desc limit 1'
+			)
+			.get(steamid64) as { hash: string } | undefined;
+		return row?.hash ?? null;
+	}
+
+	insertRawProfile(steamid64: string, takenAt: number, hash: string, body: string) {
+		this.db
+			.prepare('insert into raw_profile (steamid64, taken_at, hash, body) values (?, ?, ?, ?)')
+			.run(steamid64, takenAt, hash, gzipSync(body));
+	}
+
+	insertRawScoreboard(
+		steamid64: string,
+		takenAt: number,
+		address: { ip: string; port: number },
+		body: string
+	) {
+		this.db
+			.prepare(
+				'insert into raw_scoreboard (steamid64, taken_at, server_ip, server_port, body) values (?, ?, ?, ?, ?)'
+			)
+			.run(steamid64, takenAt, address.ip, address.port, gzipSync(body));
+	}
+
+	rawProfiles(steamid64: string): { takenAt: number; body: unknown }[] {
+		const rows = this.db
+			.prepare('select taken_at, body from raw_profile where steamid64 = ? order by taken_at, id')
+			.all(steamid64) as unknown as { taken_at: number; body: Uint8Array }[];
+		return rows.map((r) => ({
+			takenAt: r.taken_at,
+			body: JSON.parse(gunzipSync(r.body).toString('utf8'))
+		}));
+	}
+
+	rawScoreboards(steamid64: string): { takenAt: number; body: unknown }[] {
+		const rows = this.db
+			.prepare(
+				'select taken_at, body from raw_scoreboard where steamid64 = ? order by taken_at, id'
+			)
+			.all(steamid64) as unknown as { taken_at: number; body: Uint8Array }[];
+		return rows.map((r) => ({
+			takenAt: r.taken_at,
+			body: JSON.parse(gunzipSync(r.body).toString('utf8'))
+		}));
 	}
 
 	snapshots(steamid64: string): Snapshot[] {

@@ -24,7 +24,7 @@ export function seedHistory(
 	begin: number,
 	end: number
 ): SeededHistory {
-	const ingestor = new Ingestor(store, member.id);
+	const ingestor = new Ingestor(store, member.id, undefined, false);
 	const player = new SimPlayer({
 		steamid64: member.id,
 		name: member.name,

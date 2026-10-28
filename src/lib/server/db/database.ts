@@ -52,6 +52,26 @@ const MIGRATIONS = [
 		added_at integer not null
 	);
 	insert into tracked (steamid64, added_at) select steamid64, updated_at from player;
+	`,
+	`
+	create table raw_profile (
+		id integer primary key,
+		steamid64 text not null,
+		taken_at integer not null,
+		hash text not null,
+		body blob not null
+	);
+	create index raw_profile_player_time on raw_profile (steamid64, taken_at);
+
+	create table raw_scoreboard (
+		id integer primary key,
+		steamid64 text not null,
+		taken_at integer not null,
+		server_ip text not null,
+		server_port integer not null,
+		body blob not null
+	);
+	create index raw_scoreboard_player_time on raw_scoreboard (steamid64, taken_at);
 	`
 ];
 
