@@ -51,7 +51,7 @@ export function readConfig(): Config {
 		baseUrl: process.env.CYBERSHOKE_BASE_URL || 'https://cybershoke.net',
 		trackerEnabled: bool('TRACKER_ENABLED', true),
 		profileIntervalSec: int('PROFILE_INTERVAL_SEC', 60, 15),
-		idleProfileIntervalSec: int('IDLE_PROFILE_INTERVAL_SEC', 180, 15),
+		idleProfileIntervalSec: int('IDLE_PROFILE_INTERVAL_SEC', 120, 15),
 		liveIntervalSec: int('LIVE_INTERVAL_SEC', 20, 5),
 		sessionGapMin: int('SESSION_GAP_MIN', 30, 1),
 		timeZone: process.env.TZ || 'Europe/Berlin'

@@ -72,7 +72,7 @@ It must run somewhere that can reach cybershoke.net, such as the home network. E
 | `TLS_CERT`/`TLS_KEY`        | empty                    | Your own certificate instead                     |
 | `HTTPS`                     | `on`                     | `off` serves plain HTTP                          |
 | `PROFILE_INTERVAL_SEC`      | `60`                     | Profile check interval while active              |
-| `IDLE_PROFILE_INTERVAL_SEC` | `180`                    | Profile check interval after 30 minutes offline  |
+| `IDLE_PROFILE_INTERVAL_SEC` | `120`                    | Profile check interval after 30 minutes offline  |
 | `LIVE_INTERVAL_SEC`         | `20`                     | Scoreboard check interval while in game          |
 | `SESSION_GAP_MIN`           | `30`                     | A break this long starts a new session           |
 | `TRACKER_ENABLED`           | `true`                   | Set to `false` to only serve the dashboard       |
