@@ -49,9 +49,15 @@ To update, pull the new image and redeploy the project. To build it yourself ins
 
 ### HTTPS
 
-The app serves HTTPS on its port and redirects plain `http://` requests there (`/api/status` stays reachable over HTTP for the healthcheck). Certificates are signed for every local name you open it by (`obelix`, `nas.local`, `localhost`, plus the addresses in `TLS_HOSTS`).
+The app serves HTTPS on its port and redirects plain `http://` requests there (`/api/status` and `/ca.crt` stay reachable over HTTP). It has its own small certificate authority in the `data` volume (`/data/tls`), separate from any other project's, and signs a certificate for every local name you open it by (`obelix`, `nas.local`, `localhost`, plus the addresses in `TLS_HOSTS`). The CA's key never leaves the volume.
 
-By default it signs them with cs-demo-cloud's certificate authority, which your devices already trust: the compose file mounts `../cs-demo-cloud/data/tls` read-only at `/ca`. If cs-demo-cloud's project folder isn't next to this one, set `CA_PATH` to its `data/tls` folder. Without a usable CA there, the app creates its own in `/data/tls` and logs that browsers will warn until that one is installed. The log's first lines say which CA is in use.
+Browsers warn until you install that CA once per device. Download it from `http://obelix:3010/ca.crt` (it's called _cyber-tracker local CA_), then:
+
+- **Windows** (Chrome, Edge): open the file, Install Certificate, Current User, "Place all certificates in the following store", Trusted Root Certification Authorities.
+- **Firefox**: Settings, Privacy & Security, Certificates, View Certificates, Authorities, Import, tick "Trust this CA to identify websites".
+- **macOS**: open the file to add it to Keychain Access, open it there and set Trust to Always Trust.
+- **Android**: Settings, Security, Encryption & credentials, Install a certificate, CA certificate.
+- **iOS**: open the link in Safari, install the profile in Settings, then turn it on under General, About, Certificate Trust Settings.
 
 With a real certificate, set `TLS_CERT` and `TLS_KEY` instead. `HTTPS=off` serves plain HTTP.
 
@@ -67,7 +73,6 @@ It must run somewhere that can reach cybershoke.net, such as the home network. E
 | `TZ`                        | `Europe/Berlin`          | Time zone for dates on the dashboard             |
 | `DATA_DIR`                  | `/data` in the image     | Where the SQLite database goes                   |
 | `PORT`                      | `3010` in compose        | Port on the NAS                                  |
-| `TLS_CA_DIR`                | `/ca` in compose         | Folder with an existing `ca.crt` and `ca.key`    |
 | `TLS_HOSTS`                 | empty                    | IPs or extra names for the certificate           |
 | `TLS_CERT`/`TLS_KEY`        | empty                    | Your own certificate instead                     |
 | `HTTPS`                     | `on`                     | `off` serves plain HTTP                          |
