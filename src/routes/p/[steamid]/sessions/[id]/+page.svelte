@@ -86,8 +86,9 @@
 		</div>
 		<p class="muted note">
 			Deaths per mode are estimated: Cybershoke only reports total deaths, so they are split by time
-			played in each mode. Cybershoke recalculates rank points from your season instead of counting
-			them live, so a session's points change shows once you play that mode again.
+			played in each mode. Cybershoke's data shows rank points with a delay (the scoreboard keeps
+			the value from before the game), so a session's points change shows once you play that mode
+			again.
 		</p>
 	</section>
 {/if}
