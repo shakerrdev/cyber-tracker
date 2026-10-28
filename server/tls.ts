@@ -268,7 +268,7 @@ class FileCertificate implements CertificateSource {
 
 export type Certificates =
 	| { mode: 'custom'; source: CertificateSource; note: string }
-	| { mode: 'shared-ca' | 'own-ca'; source: LocalCa; note: string };
+	| { mode: 'own-ca'; source: LocalCa; note: string };
 
 export async function createCertificates(
 	env: Record<string, string | undefined>,
@@ -285,24 +285,9 @@ export async function createCertificates(
 
 	const hosts = parseHosts(env.TLS_HOSTS);
 	const hostsDir = join(dataDir, 'tls', 'hosts');
-	const shared = env.TLS_CA_DIR;
-	let warning = '';
-	if (shared && hasCa(shared)) {
-		try {
-			const ca = new LocalCa(shared, hostsDir, hosts);
-			await ca.init({ create: false });
-			await ca.defaultContext();
-			return {
-				mode: 'shared-ca',
-				source: ca,
-				note: `HTTPS signed by the existing certificate authority in ${shared} (${ca.subject})`
-			};
-		} catch (error) {
-			warning = `Can't use the CA in TLS_CA_DIR ${shared} (${(error as Error).message}), using this app's own CA. `;
-		}
-	} else if (shared) {
-		warning = `TLS_CA_DIR ${shared} has no ca.crt and ca.key, using this app's own CA. `;
-	}
+	const ignored = env.TLS_CA_DIR
+		? `TLS_CA_DIR is no longer used, remove it and the /ca volume from the compose file. `
+		: '';
 
 	const ca = new LocalCa(join(dataDir, 'tls'), hostsDir, hosts);
 	await ca.init({ create: true });
@@ -311,8 +296,8 @@ export async function createCertificates(
 		mode: 'own-ca',
 		source: ca,
 		note:
-			warning +
+			ignored +
 			`HTTPS signed by this app's own certificate authority (${ca.certPath}). ` +
-			'Browsers warn until it is installed, or point TLS_CA_DIR at a CA your devices already trust.'
+			'Browsers warn until it is installed: download it from /ca.crt once per device.'
 	};
 }

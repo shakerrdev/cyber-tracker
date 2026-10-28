@@ -1,5 +1,5 @@
 import { X509Certificate } from 'node:crypto';
-import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -60,53 +60,33 @@ describe('createCertificates', () => {
 		expect(fallback.subjectAltName).toContain('IP Address:192.168.1.20');
 	});
 
-	it('signs with an existing CA without writing into its folder', async () => {
+	it('replaces host certificates signed by another CA', async () => {
+		const data = tempDir();
+		const other = tempDir();
+		const old = new LocalCa(other, join(data, 'tls', 'hosts'));
+		await old.init({ create: true });
+		await old.contextFor('obelix');
+
+		const certs = await createCertificates({}, data);
+		await (certs.source as LocalCa).contextFor('obelix');
+
+		const root = new X509Certificate(readFileSync(join(data, 'tls', 'ca.crt')));
+		const { leaf } = leafFor(readFileSync(join(data, 'tls', 'hosts', 'obelix.pem'), 'utf8'));
+		expect(leaf.checkIssued(root)).toBe(true);
+		const fallback = leafFor(readFileSync(join(data, 'tls', 'hosts', '_default.pem'), 'utf8')).leaf;
+		expect(fallback.checkIssued(root)).toBe(true);
+	});
+
+	it('ignores TLS_CA_DIR and says so', async () => {
 		const shared = tempDir();
 		await new LocalCa(shared, join(shared, 'hosts')).init({ create: true });
-		const before = readdirSync(shared).sort();
 		const data = tempDir();
 
 		const certs = await createCertificates({ TLS_CA_DIR: shared }, data);
-		await (certs.source as LocalCa).contextFor('obelix');
-
-		expect(certs.mode).toBe('shared-ca');
-		expect(readdirSync(shared).sort()).toEqual(before);
-		const { leaf } = leafFor(readFileSync(join(data, 'tls', 'hosts', 'obelix.pem'), 'utf8'));
-		expect(leaf.checkIssued(new X509Certificate(readFileSync(join(shared, 'ca.crt'))))).toBe(true);
-	});
-
-	it('falls back to its own CA when the shared folder has none', async () => {
-		const data = tempDir();
-
-		const certs = await createCertificates({ TLS_CA_DIR: tempDir() }, data);
 
 		expect(certs.mode).toBe('own-ca');
-		expect(certs.note).toContain('has no ca.crt and ca.key');
-	});
-
-	it('re-issues host certificates when the CA changes', async () => {
-		const data = tempDir();
-		const own = await createCertificates({}, data);
-		await (own.source as LocalCa).contextFor('obelix');
-		const shared = tempDir();
-		await new LocalCa(shared, join(shared, 'hosts')).init({ create: true });
-
-		const switched = await createCertificates({ TLS_CA_DIR: shared }, data);
-		await (switched.source as LocalCa).contextFor('obelix');
-
-		const { leaf } = leafFor(readFileSync(join(data, 'tls', 'hosts', 'obelix.pem'), 'utf8'));
-		expect(leaf.checkIssued(new X509Certificate(readFileSync(join(shared, 'ca.crt'))))).toBe(true);
-	});
-
-	it('falls back to its own CA when the shared key is unusable', async () => {
-		const shared = tempDir();
-		await new LocalCa(shared, join(shared, 'hosts')).init({ create: true });
-		writeFileSync(join(shared, 'ca.key'), 'not a key');
-
-		const certs = await createCertificates({ TLS_CA_DIR: shared }, tempDir());
-
-		expect(certs.mode).toBe('own-ca');
-		expect(certs.note).toContain(`Can't use the CA in TLS_CA_DIR ${shared}`);
+		expect(certs.note).toContain('TLS_CA_DIR is no longer used');
+		expect((certs.source as LocalCa).certPath).toBe(join(data, 'tls', 'ca.crt'));
 	});
 
 	it('requires both custom certificate files', async () => {

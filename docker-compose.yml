@@ -8,11 +8,9 @@ services:
     environment:
       STEAMID64: '76561198056395137'
       TZ: Europe/Berlin
-      TLS_CA_DIR: /ca
       TLS_HOSTS: ${TLS_HOSTS:-}
     volumes:
       - data:/data
-      - ${CA_PATH:-../cs-demo-cloud/data/tls}:/ca:ro
 
 volumes:
   data:
