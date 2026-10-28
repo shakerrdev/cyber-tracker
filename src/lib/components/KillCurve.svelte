@@ -20,7 +20,8 @@
 
 	const margin = { top: 16, right: 84, bottom: 28, left: 40 };
 
-	type Flat = { t: number; kills: number; deaths: number; segment: number };
+	type Flat = { t: number; kills: number; deaths: number; untracked?: boolean; segment: number };
+	type Run = { untracked: boolean; points: Flat[] };
 	const flat = $derived<Flat[]>(
 		segments.flatMap((s, segment) => s.points.map((p) => ({ ...p, segment })))
 	);
@@ -70,7 +71,19 @@
 			.y1(height - margin.bottom)
 	);
 
-	const bySegment = $derived(segments.map((_, i) => flat.filter((p) => p.segment === i)));
+	function toRuns(points: Flat[]): Run[] {
+		const runs: Run[] = [];
+		for (let i = 1; i < points.length; i++) {
+			const untracked = !!points[i].untracked;
+			const current = runs.at(-1);
+			if (current && current.untracked === untracked) current.points.push(points[i]);
+			else runs.push({ untracked, points: [points[i - 1], points[i]] });
+		}
+		return runs;
+	}
+
+	const runs = $derived(segments.flatMap((_, i) => toRuns(flat.filter((p) => p.segment === i))));
+	const hasGaps = $derived(runs.some((r) => r.untracked));
 	const last = $derived(flat.at(-1));
 	const xTicks = $derived(timeTicks(start, end, timeZone, Math.max(3, Math.floor(width / 100))));
 	const yTicks = $derived(y.ticks(4));
@@ -145,11 +158,13 @@
 				>
 			{/each}
 
-			{#each bySegment as points, i (i)}
-				<path class="lead" d={band(points)} clip-path="url(#{uid}-above)" />
-				<path class="trail" d={band(points)} clip-path="url(#{uid}-below)" />
-				<path class="deaths" d={deathLine(points)} />
-				<path class="kills" d={killLine(points)} />
+			{#each runs as run, i (i)}
+				{#if !run.untracked}
+					<path class="lead" d={band(run.points)} clip-path="url(#{uid}-above)" />
+					<path class="trail" d={band(run.points)} clip-path="url(#{uid}-below)" />
+				{/if}
+				<path class="deaths" class:gap={run.untracked} d={deathLine(run.points)} />
+				<path class="kills" class:gap={run.untracked} d={killLine(run.points)} />
 			{/each}
 
 			{#each segments.slice(1) as segment (segment.startedAt)}
@@ -199,6 +214,9 @@
 				<p>
 					<strong>{active.deaths > 0 ? fmt(active.kills / active.deaths, 2) : '–'}</strong> K/D
 				</p>
+				{#if active.untracked}
+					<p class="where">Not tracked since the previous point</p>
+				{/if}
 				<p class="where">
 					{modeLabel(segment.modeId)}{segment.serverNum ? ` #${segment.serverNum}` : ''}, {segment.maps
 						.map(mapName)
@@ -208,6 +226,11 @@
 		{/if}
 	{/if}
 </figure>
+{#if hasGaps}
+	<p class="note">
+		<span class="key dotted"></span>Dotted: not tracked, straight line between readings
+	</p>
+{/if}
 
 <style>
 	.curve {
@@ -251,6 +274,16 @@
 
 	.deaths {
 		stroke: var(--death);
+	}
+
+	.gap {
+		stroke-dasharray: 0.5 5;
+	}
+
+	.note {
+		margin-top: 6px;
+		font-size: 0.8125rem;
+		color: var(--ink-3);
 	}
 
 	.lead {
@@ -333,5 +366,12 @@
 
 	.key.d {
 		background: var(--death);
+	}
+
+	.key.dotted {
+		background: radial-gradient(circle, var(--ink-3) 1px, transparent 1.5px) 0 50% / 5px 3px
+			repeat-x;
+		height: 3px;
+		width: 16px;
 	}
 </style>
