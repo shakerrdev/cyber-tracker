@@ -16,6 +16,7 @@ const useHttps = !['off', 'false', '0', 'no'].includes((process.env.HTTPS ?? 'on
 const certificates = useHttps
 	? await createCertificates(process.env, resolve(process.env.DATA_DIR || 'data'))
 	: null;
+if (certificates?.mode === 'own-ca') process.env.TLS_CA_CERT = certificates.source.certPath;
 
 const handlerUrl = new URL('../build/handler.js', import.meta.url).href;
 const { handler } = (await import(handlerUrl)) as { handler: Handler };
@@ -30,7 +31,12 @@ function serve(req: IncomingMessage, res: ServerResponse, protocol: 'http' | 'ht
 
 function servePlain(req: IncomingMessage, res: ServerResponse) {
 	const path = (req.url ?? '/').split('?')[0];
-	if (!certificates || req.headers[protocolHeader] || path === '/api/status') {
+	if (
+		!certificates ||
+		req.headers[protocolHeader] ||
+		path === '/api/status' ||
+		path === '/ca.crt'
+	) {
 		return serve(req, res, 'http');
 	}
 	if (!req.headers.host) {
