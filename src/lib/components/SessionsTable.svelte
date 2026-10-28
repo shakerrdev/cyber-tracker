@@ -51,7 +51,17 @@
 					<td class="num">{fmt(row.metrics.kpm, 2)}</td>
 					<td class="num">{pct(row.metrics.hsPct)}</td>
 					<td class="num">{pct(row.metrics.accuracy, 1)}</td>
-					<td class="num">{signed(row.metrics.pointsDelta)}</td>
+					<td
+						class="num"
+						class:muted={row.metrics.pointsPending && row.metrics.pointsDelta === null}
+						title={row.metrics.pointsPending
+							? 'Filled in after the next session in this mode'
+							: undefined}
+					>
+						{row.metrics.pointsPending && row.metrics.pointsDelta === null
+							? 'pending'
+							: signed(row.metrics.pointsDelta)}
+					</td>
 				</tr>
 			{/each}
 		</tbody>

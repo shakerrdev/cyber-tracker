@@ -26,9 +26,14 @@
 			<span class="big">{fmt(row.metrics.deaths)}</span>
 			<span class="caption"><span class="key d"></span>deaths</span>
 		</div>
-		{#if row.metrics.pointsDelta !== null}
+		{#if row.metrics.pointsDelta !== null || row.metrics.pointsPending}
 			<div class="tally">
-				<span class="mid">{signed(row.metrics.pointsDelta)}</span>
+				<span
+					class="mid"
+					title={row.metrics.pointsPending
+						? 'Filled in after your next session in this mode'
+						: undefined}>{signed(row.metrics.pointsDelta)}</span
+				>
 				<span class="caption">rank points</span>
 			</div>
 		{/if}
@@ -41,7 +46,7 @@
 		{/each}
 	</dl>
 
-	{#if compare || row.provisional}
+	{#if compare || row.provisional || row.metrics.pointsPending}
 		<p class="note muted">
 			{#if compare}
 				{#if baseline}
@@ -54,6 +59,11 @@
 			{/if}
 			{#if row.provisional}
 				Live numbers for now; the full stats arrive after leaving the server.
+			{/if}
+			{#if row.metrics.pointsPending}
+				Rank points are filled in after your next session in {row.modeIds.length > 1
+					? 'these modes'
+					: 'this mode'}: Cybershoke shows them with a delay.
 			{/if}
 		</p>
 	{/if}

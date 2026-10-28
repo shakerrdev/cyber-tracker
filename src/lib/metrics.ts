@@ -2,6 +2,7 @@ import type { ModeTotals, WeaponCounters } from './types.ts';
 
 export type Totals = Omit<ModeTotals, 'modeId' | 'pointsBefore' | 'pointsAfter'> & {
 	pointsDelta: number | null;
+	pointsPending: boolean;
 };
 
 export interface Metrics {
@@ -17,6 +18,7 @@ export interface Metrics {
 	ttkMs: number | null;
 	pointsDelta: number | null;
 	pointsFinal: boolean;
+	pointsPending: boolean;
 }
 
 function ratio(a: number, b: number): number | null {
@@ -69,7 +71,8 @@ export function combine(modes: ModeTotals[]): Totals {
 		clutches: {},
 		provisional: false,
 		pointsDelta: null,
-		pointsFinal: true
+		pointsFinal: true,
+		pointsPending: false
 	};
 	return modes.reduce<Totals>((acc, m) => {
 		const delta =
@@ -97,7 +100,8 @@ export function combine(modes: ModeTotals[]): Totals {
 			clutches: mergeNumbers(acc.clutches, m.clutches),
 			provisional: acc.provisional || m.provisional,
 			pointsDelta: delta === null ? acc.pointsDelta : (acc.pointsDelta ?? 0) + delta,
-			pointsFinal: delta === null ? acc.pointsFinal : acc.pointsFinal && m.pointsFinal
+			pointsFinal: delta === null ? acc.pointsFinal : acc.pointsFinal && m.pointsFinal,
+			pointsPending: acc.pointsPending || (m.pointsBefore !== null && !m.pointsFinal)
 		};
 	}, base);
 }
@@ -116,7 +120,8 @@ export function metrics(t: Totals): Metrics {
 		dpm: minutes >= 1 && t.damage > 0 ? t.damage / minutes : null,
 		ttkMs: ratio(t.ttkSumMs, t.ttkCount),
 		pointsDelta: t.pointsDelta,
-		pointsFinal: t.pointsFinal
+		pointsFinal: t.pointsFinal,
+		pointsPending: t.pointsPending
 	};
 }
 
