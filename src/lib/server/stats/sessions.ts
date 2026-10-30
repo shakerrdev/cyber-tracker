@@ -131,9 +131,13 @@ export function buildSessions(
 			}
 		}
 
+		const liveDeaths = new Map<number, number>();
 		const extras = new Map<number, LiveExtra>();
 		for (const stint of g.stints) {
-			if (isFlushed(stint, g.deltas)) continue;
+			if (isFlushed(stint, g.deltas)) {
+				liveDeaths.set(stint.modeId, (liveDeaths.get(stint.modeId) ?? 0) + stint.deaths);
+				continue;
+			}
 			const extra = extras.get(stint.modeId) ?? { kills: 0, deaths: 0, headshots: 0, seconds: 0 };
 			extra.kills += stint.kills;
 			extra.deaths += stint.deaths;
@@ -148,7 +152,7 @@ export function buildSessions(
 				totals(
 					id,
 					counters.get(id)?.counters ?? emptyMode(),
-					counters.get(id)?.deaths ?? 0,
+					liveDeaths.get(id) ?? counters.get(id)?.deaths ?? 0,
 					extras.get(id),
 					pointsFor(groups, index, id)
 				)

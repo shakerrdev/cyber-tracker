@@ -288,6 +288,30 @@ describe('buildSessions', () => {
 		});
 	});
 
+	it('takes deaths per mode from the scoreboard when the profile total lags', () => {
+		const snapshots = [
+			snap(1, 0, 100, 10_000, {
+				11: { kills: 1000, playtime: 50_000 },
+				22: { kills: 0, playtime: 0 }
+			}),
+			snap(2, 100_000, 130, 10_780, {
+				11: { kills: 1048, playtime: 50_480 },
+				22: { kills: 21, playtime: 300 }
+			})
+		];
+		const samples = [
+			sample(99_000, 30, 20, 400),
+			sample(99_100, 48, 29, 480),
+			sample(99_700, 18, 17, 240, { serverPort: 27016, modeId: 22 })
+		];
+
+		const [session] = buildSessions(snapshots, samples, { gapSec: 1800, liveActive: false });
+
+		const byMode = Object.fromEntries(session.modes.map((m) => [m.modeId, m]));
+		expect(byMode[11]).toMatchObject({ kills: 48, deaths: 29, provisional: false });
+		expect(byMode[22]).toMatchObject({ kills: 21, deaths: 17, provisional: false });
+	});
+
 	it('takes the rank points of the next session as the result', () => {
 		const samples = [
 			sample(100_000, 1, 0, 60, { points: 1000 }),

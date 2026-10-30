@@ -93,7 +93,8 @@
 			</table>
 		</div>
 		<p class="muted note">
-			Deaths per mode are estimated: Cybershoke only reports total deaths, so they are split by time
+			Deaths per mode come from the live scoreboard. Without it (server hidden) they are estimated:
+			Cybershoke only reports total deaths, and not always right away, so they are split by time
 			played in each mode. Cybershoke's data shows rank points with a delay (the scoreboard keeps
 			the value from before the game), so a session's points change shows once you play that mode
 			again.
